@@ -1,0 +1,12 @@
+version: "2.2"
+services:
+  ubuntu:
+    image: ubuntu:18.04
+    build:
+      context: .
+      dockerfile: dockerfile-ubuntu
+    image: ubuntu:latest
+    container_name: ubuntu
+    tty: true
+    volumes:
+      - "./src:/zcc"
