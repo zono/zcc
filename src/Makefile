@@ -1,4 +1,11 @@
-zcc: zcc.c
+CFLAGS=-Wall -std=c11 -g
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
+
+zcc: $(OBJS)
+	cc -o $@ $(OBJS) $(LDFLAGS)
+
+$(OBJS): zcc.h
 
 test: zcc
 	./test.sh
