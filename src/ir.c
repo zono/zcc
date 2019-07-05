@@ -1,6 +1,6 @@
 #include "zcc.h"
 
-IR *new_ir(int op, int lhs, int rhs)
+static IR *new_ir(int op, int lhs, int rhs)
 {
   IR *ir = malloc(sizeof(IR));
   ir->op = op;
@@ -9,7 +9,7 @@ IR *new_ir(int op, int lhs, int rhs)
   return ir;
 }
 
-int gen(Vector *v, Node *node)
+static int gen(Vector *v, Node *node)
 {
   static int regno;
 
@@ -20,7 +20,7 @@ int gen(Vector *v, Node *node)
     return r;
   }
 
-  assert(node->ty == '+' || node->ty == '-');
+  assert(strchr("+-*", node->ty));
 
   int lhs = gen(v, node->lhs);
   int rhs = gen(v, node->rhs);

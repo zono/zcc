@@ -1,8 +1,7 @@
 #include "zcc.h"
 
 // Tokenizer
-Token *add_token(Vector *v, int ty, char *input)
-{
+static Token *add_token(Vector *v, int ty, char *input) {
   Token *t = malloc(sizeof(Token));
   t->ty = ty;
   t->input = input;
@@ -11,23 +10,19 @@ Token *add_token(Vector *v, int ty, char *input)
 }
 
 // Tokenized input is stored to this array.
-Vector *tokenize(char *p)
-{
+Vector *tokenize(char *p) {
   Vector *v = new_vec();
 
   int i = 0;
-  while (*p)
-  {
+  while (*p) {
     // Skip whitespace
-    if (isspace(*p))
-    {
+    if (isspace(*p)) {
       p++;
       continue;
     }
 
-    // + or -
-    if (*p == '+' || *p == '-')
-    {
+    // Single-letter token
+    if (strchr("+-*", *p)) {
       add_token(v, *p, p);
       i++;
       p++;
@@ -35,8 +30,7 @@ Vector *tokenize(char *p)
     }
 
     // Number
-    if (isdigit(*p))
-    {
+    if (isdigit(*p)) {
       Token *t = add_token(v, TK_NUM, p);
       t->val = strtol(p, &p, 10);
       i++;

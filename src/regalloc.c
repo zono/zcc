@@ -1,10 +1,11 @@
 #include "zcc.h"
 
 char *regs[] = {"rdi", "rsi", "r10", "r11", "r12", "r13", "r14", "r15"};
+
 static bool used[sizeof(regs) / sizeof(*regs)];
 static int *reg_map;
 
-int alloc(int ir_reg)
+static int alloc(int ir_reg)
 {
   if (reg_map[ir_reg] != -1)
   {
@@ -24,7 +25,7 @@ int alloc(int ir_reg)
   error("register exhausted");
 }
 
-void kill(int r)
+static void kill(int r)
 {
   assert(used[r]);
   used[r] = false;
@@ -48,6 +49,7 @@ void alloc_regs(Vector *irv)
     case IR_MOV:
     case '+':
     case '-':
+    case '*':
       ir->lhs = alloc(ir->lhs);
       ir->rhs = alloc(ir->rhs);
       break;
