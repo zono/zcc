@@ -20,7 +20,7 @@ typedef struct
   int len;
 } Vector;
 
-Vector *new_vec();
+Vector *new_vec(void);
 void vec_push(Vector *v, void *elem);
 
 typedef struct
@@ -43,16 +43,17 @@ void util_test();
 enum
 {
   TK_NUM = 256, // Number literal
+  TK_IDENT,     // Identifier
   TK_RETURN,    // "return"
   TK_EOF,       // End marker
 };
 
-/// Token type
-
+// Token type
 typedef struct
 {
   int ty;      // Token type
   int val;     // Number literal
+  char *name;  // Identifier
   char *input; // Token string (for error reporting)
 } Token;
 
@@ -63,9 +64,10 @@ Vector *tokenize(char *p);
 enum
 {
   ND_NUM = 256, // Number literal
+  ND_IDENT,     // Identifier
   ND_RETURN,    // Return statement
   ND_COMP_STMT, // Compound statement
-  ND_EXPR_STMT, // Expressions statement
+  ND_EXPR_STMT, // Expressions tatement
 };
 
 typedef struct Node
@@ -74,7 +76,8 @@ typedef struct Node
   struct Node *lhs;  // left-hand side
   struct Node *rhs;  // right-hand side
   int val;           // Number literal
-  struct Node *expr; // "return" or expression stmt
+  char *name;        // Identifier
+  struct Node *expr; // "return" or expresson stmt
   Vector *stmts;     // Compound statement
 } Node;
 
@@ -87,6 +90,9 @@ enum
   IR_IMM,
   IR_MOV,
   IR_RETURN,
+  IR_ALLOCA,
+  IR_LOAD,
+  IR_STORE,
   IR_KILL,
   IR_NOP,
 };
@@ -106,5 +112,4 @@ extern char *regs[];
 void alloc_regs(Vector *irv);
 
 /// codegen.c
-
 void gen_x86(Vector *irv);
