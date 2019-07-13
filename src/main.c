@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   else
   {
     if (argc != 2)
-      error("Usage: zcc [-test] [-dump-ir] <code>\n");
+      error("Usage: zcc [-test] [-dump-ir1] [-dump-ir2]<code>\n");
     input = argv[1];
   }
 
