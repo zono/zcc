@@ -8,6 +8,7 @@ zcc: $(OBJS)
 $(OBJS): zcc.h
 
 test: zcc
+	./zcc -test
 	./test.sh
 
 clean:
