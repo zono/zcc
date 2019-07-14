@@ -151,12 +151,13 @@ static Node *compound_stmt()
   node->ty = ND_COMP_STMT;
   node->stmts = new_vec();
 
-  while(!consume('}'))
+  while (!consume('}'))
     vec_push(node->stmts, stmt());
   return node;
 }
 
-static Node *function() {
+static Node *function()
+{
   Node *node = calloc(1, sizeof(Node));
   node->ty = ND_FUNC;
   node->args = new_vec();
@@ -168,14 +169,21 @@ static Node *function() {
   pos++;
 
   expect('(');
-  while (!consume(')'))
+  if (!consume(')'))
+  {
     vec_push(node->args, term());
+    while (consume(','))
+      vec_push(node->args, term());
+    expect(')');
+  }
+
   expect('{');
   node->body = compound_stmt();
   return node;
 };
 
-Vector *parse(Vector *tokens_) {
+Vector *parse(Vector *tokens_)
+{
   tokens = tokens_;
   pos = 0;
   Vector *v = new_vec();
