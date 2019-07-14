@@ -40,9 +40,8 @@ static void visit(Vector *irv)
   for (int i = 0; i < irv->len; i++)
   {
     IR *ir = irv->data[i];
-    IRInfo *info = get_irinfo(ir);
 
-    switch (info->ty)
+    switch (irinfo[ir->op].ty)
     {
     case IR_TY_REG:
     case IR_TY_REG_IMM:
@@ -70,7 +69,8 @@ static void visit(Vector *irv)
 
 void alloc_regs(Vector *fns)
 {
-  for (int i = 0; i < fns->len; i++) {
+  for (int i = 0; i < fns->len; i++)
+  {
     Function *fn = fns->data[i];
 
     reg_map = malloc(sizeof(int) * fn->ir->len);
