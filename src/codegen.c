@@ -4,7 +4,8 @@ static int label;
 
 const char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
-void gen(Function *fn) {
+void gen(Function *fn)
+{
   char *ret = format(".Lend%d", label++);
 
   printf(".global %s\n", fn->name);
@@ -17,10 +18,12 @@ void gen(Function *fn) {
   printf("  push r14\n");
   printf("  push r15\n");
 
-  for (int i = 0; i < fn->ir->len; i++) {
+  for (int i = 0; i < fn->ir->len; i++)
+  {
     IR *ir = fn->ir->data[i];
 
-    switch (ir->op) {
+    switch (ir->op)
+    {
     case IR_IMM:
       printf("  mov %s, %d\n", regs[ir->lhs], ir->rhs);
       break;
@@ -34,9 +37,10 @@ void gen(Function *fn) {
       printf("  mov rax, %s\n", regs[ir->lhs]);
       printf("  jmp %s\n", ret);
       break;
-    case IR_CALL: {
+    case IR_CALL:
+    {
       for (int i = 0; i < ir->nargs; i++)
-	      printf("  mov %s, %s\n", argreg[i], regs[ir->args[i]]);
+        printf("  mov %s, %s\n", argreg[i], regs[ir->args[i]]);
 
       printf("  push r10\n");
       printf("  push r11\n");
@@ -68,18 +72,18 @@ void gen(Function *fn) {
       for (int i = 0; i < ir->lhs; i++)
         printf("  mov [rbp-%d], %s\n", (i + 1) * 8, argreg[i]);
       break;
-    case '+':
+    case IR_ADD:
       printf("  add %s, %s\n", regs[ir->lhs], regs[ir->rhs]);
       break;
-    case '-':
+    case IR_SUB:
       printf("  sub %s, %s\n", regs[ir->lhs], regs[ir->rhs]);
       break;
-    case '*':
+    case IR_MUL:
       printf("  mov rax, %s\n", regs[ir->rhs]);
       printf("  mul %s\n", regs[ir->lhs]);
       printf("  mov %s, rax\n", regs[ir->lhs]);
       break;
-    case '/':
+    case IR_DIV:
       printf("  mov rax, %s\n", regs[ir->lhs]);
       printf("  cqo\n");
       printf("  div %s\n", regs[ir->rhs]);
@@ -102,7 +106,8 @@ void gen(Function *fn) {
   printf("  ret\n");
 }
 
-void gen_x86(Vector *fns) {
+void gen_x86(Vector *fns)
+{
   printf(".intel_syntax noprefix\n");
 
   for (int i = 0; i < fns->len; i++)
