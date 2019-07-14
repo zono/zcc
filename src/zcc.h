@@ -124,7 +124,6 @@ enum
   IR_LABEL,
   IR_JMP,
   IR_UNLESS,
-  IR_ALLOCA,
   IR_LOAD,
   IR_STORE,
   IR_KILL,
@@ -165,6 +164,7 @@ typedef struct
 {
   char *name;
   int args[6];
+  int stacksize;
   Vector *ir;
 } Function;
 
