@@ -58,6 +58,8 @@ enum
   TK_IDENT,     // Identifier
   TK_IF,        // "if"
   TK_ELSE,      // "else"
+  TK_LOGOR,     // ||
+  TK_LOGAND,    // &&
   TK_RETURN,    // "return"
   TK_EOF,       // End marker
 };
@@ -80,6 +82,8 @@ enum
   ND_NUM = 256, // Number literal
   ND_IDENT,     // Identifier
   ND_IF,        // "if"
+  ND_LOGAND,    // &&
+  ND_LOGOR,     // ||
   ND_RETURN,    // "return"
   ND_CALL,      // Function call
   ND_FUNC,      // Function definition
@@ -152,6 +156,7 @@ enum
   IR_TY_NOARG,
   IR_TY_REG,
   IR_TY_IMM,
+  IR_TY_JMP,
   IR_TY_LABEL,
   IR_TY_REG_REG,
   IR_TY_REG_IMM,
