@@ -40,14 +40,6 @@ loop:
       continue;
     }
 
-    // Single-letter token
-    if (strchr("+-*/;=(),{}<>[]", *p))
-    {
-      add_token(v, *p, p);
-      p++;
-      continue;
-    }
-
     // Multi-letter symbol or keyword
     for (int i = 0; symbols[i].name; i++)
     {
@@ -59,6 +51,14 @@ loop:
       add_token(v, symbols[i].ty, p);
       p += len;
       goto loop;
+    }
+
+    // Single-letter token
+    if (strchr("+-*/;=(),{}<>[]&", *p))
+    {
+      add_token(v, *p, p);
+      p++;
+      continue;
     }
 
     // Identifier
