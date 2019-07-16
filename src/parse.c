@@ -38,7 +38,7 @@ static Node *new_node(int op, Node *lhs, Node *rhs)
   return node;
 }
 
-static Node *term()
+static Node *primary()
 {
   Token *t = tokens->data[pos++];
 
@@ -86,6 +86,20 @@ static Node *term()
 
 static Node *mul();
 
+static Node *postfix()
+{
+  Node *lhs = primary();
+  while (consume('['))
+  {
+    Node *node = calloc(1, sizeof(Node));
+    node->op = ND_DEREF;
+    node->expr = new_node('+', lhs, primary());
+    lhs = node;
+    expect(']');
+  }
+  return lhs;
+}
+
 static Node *unary()
 {
   if (consume('*'))
@@ -109,7 +123,7 @@ static Node *unary()
     node->expr = unary();
     return node;
   }
-  return term();
+  return postfix();
 }
 
 static Node *mul()
@@ -207,6 +221,25 @@ static Type *type()
   return ty;
 }
 
+static Type *read_array(Type *ty)
+{
+  Vector *v = new_vec();
+  while (consume('['))
+  {
+    Node *len = primary();
+    if (len->op != ND_NUM)
+      error("number expected");
+    vec_push(v, len);
+    expect(']');
+  }
+  for (int i = v->len - 1; i >= 0; i--)
+  {
+    Node *len = v->data[i];
+    ty = ary_of(ty, len->val);
+  }
+  return ty;
+}
+
 static Node *decl()
 {
   Node *node = calloc(1, sizeof(Node));
@@ -223,20 +256,7 @@ static Node *decl()
   pos++;
 
   // Read the second half of type name (e.g. `[3][5]`).
-  Vector *ary_size = new_vec();
-  while (consume('['))
-  {
-    Node *len = term();
-    if (len->op != ND_NUM)
-      error("number expected");
-    vec_push(ary_size, len);
-    expect(']');
-  }
-  for (int i = ary_size->len - 1; i >= 0; i--)
-  {
-    Node *len = ary_size->data[i];
-    node->ty = ary_of(node->ty, len->val);
-  }
+  node->ty = read_array(node->ty);
 
   // Read an initializer.
   if (consume('='))
