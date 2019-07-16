@@ -175,7 +175,8 @@ static Node *stmt()
       error("variable name expected, but got %s", t->input);
     node->name = t->name;
     pos++;
-
+    if (consume('='))
+      node->init = assign();
     expect(';');
     return node;
   }
