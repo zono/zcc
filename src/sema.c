@@ -11,6 +11,21 @@ typedef struct
 static Map *vars;
 static int stacksize;
 
+int size_of(Type *ty)
+{
+  if (ty->ty == INT)
+    return 4;
+  assert(ty->ty == PTR);
+  return 8;
+}
+
+static void swap(Node **p, Node **q)
+{
+  Node *r = *p;
+  *p = *q;
+  *q = r;
+}
+
 static void walk(Node *node)
 {
   switch (node->op)
@@ -53,11 +68,17 @@ static void walk(Node *node)
     walk(node->body);
     return;
   case '+':
+  case '-':
     walk(node->lhs);
     walk(node->rhs);
+
+    if (node->rhs->ty->ty == PTR)
+      swap(&node->lhs, &node->rhs);
+    if (node->rhs->ty->ty == PTR)
+      error("'pointer %c pointer' is not defined", node->op);
+
     node->ty = node->lhs->ty;
     return;
-  case '-':
   case '*':
   case '/':
   case '=':
@@ -69,6 +90,11 @@ static void walk(Node *node)
     node->ty = node->lhs->ty;
     return;
   case ND_DEREF:
+    walk(node->expr);
+    if (node->expr->ty->ty != PTR)
+      error("operand must be a pointer");
+    node->ty = node->expr->ty->ptr_of;
+    return;
   case ND_RETURN:
     walk(node->expr);
     return;
