@@ -2,7 +2,8 @@
 
 static int label;
 
-const char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+const char *argreg32[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
+const char *argreg64[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 void gen(Function *fn)
 {
@@ -40,7 +41,7 @@ void gen(Function *fn)
     case IR_CALL:
     {
       for (int i = 0; i < ir->nargs; i++)
-        printf("  mov %s, %s\n", argreg[i], regs[ir->args[i]]);
+        printf("  mov %s, %s\n", argreg64[i], regs[ir->args[i]]);
 
       printf("  push r10\n");
       printf("  push r11\n");
@@ -67,15 +68,23 @@ void gen(Function *fn)
       printf("  cmp %s, 0\n", regs[ir->lhs]);
       printf("  je .L%d\n", ir->rhs);
       break;
-    case IR_LOAD:
+    case IR_LOAD32:
+      printf("  mov %s, [%s]\n", regs32[ir->lhs], regs[ir->rhs]);
+      break;
+    case IR_LOAD64:
       printf("  mov %s, [%s]\n", regs[ir->lhs], regs[ir->rhs]);
       break;
-    case IR_STORE:
+    case IR_STORE32:
+      printf("  mov [%s], %s\n", regs[ir->lhs], regs32[ir->rhs]);
+      break;
+    case IR_STORE64:
       printf("  mov [%s], %s\n", regs[ir->lhs], regs[ir->rhs]);
       break;
-    case IR_SAVE_ARGS:
-      for (int i = 0; i < ir->lhs; i++)
-        printf("  mov [rbp-%d], %s\n", (i + 1) * 8, argreg[i]);
+    case IR_STORE32_ARG:
+      printf("  mov [rbp-%d], %s\n", ir->lhs, argreg32[ir->rhs]);
+      break;
+    case IR_STORE64_ARG:
+      printf("  mov [rbp-%d], %s\n", ir->lhs, argreg64[ir->rhs]);
       break;
     case IR_ADD:
       printf("  add %s, %s\n", regs[ir->lhs], regs[ir->rhs]);
