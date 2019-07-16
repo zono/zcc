@@ -84,6 +84,7 @@ enum
   ND_NUM = 256, // Number literal
   ND_IDENT,     // Identifier
   ND_VARDEF,    // Variable definition
+  ND_LVAR,      // Variable reference
   ND_IF,        // "if"
   ND_FOR,       // "for"
   ND_LOGAND,    // &&
@@ -106,7 +107,7 @@ typedef struct Node
 
   char *name;
 
-  // "if" (cond) then "else" els
+  // "if" ( cond ) then "else" els
   // "for" ( init; cond; inc ) body
   struct Node *cond;
   struct Node *then;
@@ -115,11 +116,21 @@ typedef struct Node
   struct Node *inc;
   struct Node *body;
 
+  // Function definition
+  int stacksize;
+
+  // Local variable
+  int offset;
+
   // Function call
   Vector *args;
 } Node;
 
 Vector *parse(Vector *tokens);
+
+/// sema.c
+
+void sema(Vector *nodes);
 
 /// gen_ir.c
 
