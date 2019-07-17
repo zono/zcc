@@ -74,11 +74,14 @@ enum
   TK_NUM = 256, // Number literal
   TK_STR,       // String literal
   TK_IDENT,     // Identifier
+  TK_EXTERN,    // "extern"
   TK_INT,       // "int"
   TK_CHAR,      // "char"
   TK_IF,        // "if"
   TK_ELSE,      // "else"
   TK_FOR,       // "for"
+  TK_DO,        // "do"
+  TK_WHILE,     // "while"
   TK_EQ,        // ==
   TK_NE,        // !=
   TK_LOGOR,     // ||
@@ -115,6 +118,7 @@ enum
   ND_GVAR,      // Global variable reference
   ND_IF,        // "if"
   ND_FOR,       // "for"
+  ND_DO_WHILE,  // do ~ while
   ND_ADDR,      // address-of operator ("&")
   ND_DEREF,     // pointer dereference ("*")
   ND_EQ,        // ==
@@ -150,6 +154,7 @@ typedef struct Node
   char *name;
 
   // Global variable
+  bool is_extern;
   char *data;
   int len;
 
@@ -188,6 +193,7 @@ typedef struct
 
   // global
   char *name;
+  bool is_extern;
   char *data;
   int len;
 } Var;
@@ -213,6 +219,7 @@ enum
   IR_NE,
   IR_LT,
   IR_JMP,
+  IR_IF,
   IR_UNLESS,
   IR_LOAD8,
   IR_LOAD32,

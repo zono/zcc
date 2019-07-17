@@ -346,6 +346,16 @@ static Node *stmt()
     expect(')');
     node->body = stmt();
     return node;
+  case TK_DO:
+    pos++;
+    node->op = ND_DO_WHILE;
+    node->body = stmt();
+    expect(TK_WHILE);
+    expect('(');
+    node->cond = assign();
+    expect(')');
+    expect(';');
+    return node;
   case TK_RETURN:
     pos++;
     node->op = ND_RETURN;
@@ -377,6 +387,7 @@ static Node *compound_stmt()
 
 static Node *toplevel()
 {
+  bool is_extern = consume(TK_EXTERN);
   Type *ty = type();
   if (!ty)
   {
@@ -417,8 +428,12 @@ static Node *toplevel()
   node->op = ND_VARDEF;
   node->ty = read_array(ty);
   node->name = name;
-  node->data = calloc(1, size_of(node->ty));
-  node->len = size_of(node->ty);
+  if (is_extern) {
+    node->is_extern = true;
+  } else {
+    node->data = calloc(1, size_of(node->ty));
+    node->len = size_of(node->ty);
+  }
   expect(';');
   return node;
 };

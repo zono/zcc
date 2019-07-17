@@ -101,6 +101,10 @@ void gen(Function *fn)
     case IR_LT:
       emit_cmp(ir, "setl");
       break;
+    case IR_IF:
+      printf("  cmp %s, 0\n", regs[ir->lhs]);
+      printf("  jne .L%d\n", ir->rhs);
+      break;
     case IR_JMP:
       printf("  jmp .L%d\n", ir->lhs);
       break;
@@ -177,6 +181,8 @@ void gen_x86(Vector *globals, Vector *fns)
   for (int i = 0; i < globals->len; i++)
   {
     Var *var = globals->data[i];
+    if (var->is_extern)
+      continue;
     printf("%s:\n", var->name);
     printf("  .ascii \"%s\"\n", escape(var->data, var->len));
   }

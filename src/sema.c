@@ -25,7 +25,7 @@ static Var *new_global(Type *ty, char *name, char *data, int len)
   Var *var = calloc(1, sizeof(Var));
   var->ty = ty;
   var->is_local = false;
-  var->name = format(".L.str%d", str_label++);
+  var->name = name;
   var->data = data;
   var->len = len;
   return var;
@@ -135,6 +135,10 @@ static Node *walk(Env *env, Node *node, bool decay)
     node->inc = walk(env, node->inc, true);
     node->body = walk(env, node->body, true);
     return node;
+  case ND_DO_WHILE:
+    node->cond = walk(env, node->cond, true);
+    node->body = walk(env, node->body, true);
+    return node;
   case '+':
   case '-':
     node->lhs = walk(env, node->lhs, true);
@@ -225,6 +229,7 @@ Vector *sema(Vector *nodes)
     if (node->op == ND_VARDEF)
     {
       Var *var = new_global(node->ty, node->name, node->data, node->len);
+      var->is_extern = node->is_extern;
       vec_push(globals, var);
       map_put(topenv->vars, node->name, var);
       continue;
