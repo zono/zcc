@@ -42,6 +42,22 @@ loop:
       continue;
     }
 
+    // String literal
+    if (*p == '"')
+    {
+      Token *t = add_token(v, TK_STR, p);
+      p++;
+
+      int len = 0;
+      while (p[len] && p[len] != '"')
+        len++;
+      if (!p[len])
+        error("premature end of input");
+      t->str = strndup(p, len);
+      p = p + len + 1;
+      continue;
+    }
+
     // Multi-letter symbol or keyword
     for (int i = 0; symbols[i].name; i++)
     {

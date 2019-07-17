@@ -71,6 +71,7 @@ void util_test();
 enum
 {
   TK_NUM = 256, // Number literal
+  TK_STR,       // String literal
   TK_IDENT,     // Identifier
   TK_INT,       // "int"
   TK_CHAR,      // "char"
@@ -89,6 +90,7 @@ typedef struct
 {
   int ty;      // Token type
   int val;     // Number literal
+  char *str;   // String literal
   char *name;  // Identifier
   char *input; // Token string (for error reporting)
 } Token;
@@ -100,9 +102,11 @@ Vector *tokenize(char *p);
 enum
 {
   ND_NUM = 256, // Number literal
+  ND_STR,       // String literal
   ND_IDENT,     // Identifier
   ND_VARDEF,    // Variable definition
-  ND_LVAR,      // Variable reference
+  ND_LVAR,      // Local variable reference
+  ND_GVAR,      // Global variable reference
   ND_IF,        // "if"
   ND_FOR,       // "for"
   ND_ADDR,      // address-of operator ("&")
@@ -132,6 +136,7 @@ typedef struct Node
   struct Node *lhs;  // left-hand side
   struct Node *rhs;  // right-hand side
   int val;           // Number literal
+  char *str;         // String literal
   struct Node *expr; // "return" or expresson stmt
   Vector *stmts;     // Compound statement
 
@@ -148,6 +153,7 @@ typedef struct Node
 
   // Function definition
   int stacksize;
+  Vector *strings;
 
   // Local variable
   int offset;
@@ -177,6 +183,7 @@ enum
   IR_RETURN,
   IR_CALL,
   IR_LABEL,
+  IR_LABEL_ADDR,
   IR_LT,
   IR_JMP,
   IR_UNLESS,
@@ -212,6 +219,7 @@ enum
   IR_TY_IMM,
   IR_TY_JMP,
   IR_TY_LABEL,
+  IR_TY_LABEL_ADDR,
   IR_TY_REG_REG,
   IR_TY_REG_IMM,
   IR_TY_IMM_IMM,
@@ -229,6 +237,7 @@ typedef struct
 {
   char *name;
   int stacksize;
+  Vector *strings;
   Vector *ir;
 } Function;
 
