@@ -131,6 +131,7 @@ enum
   ND_FUNC,      // Function definition
   ND_COMP_STMT, // Compound statement
   ND_EXPR_STMT, // Expressions tatement
+  ND_STMT_EXPR, // Statement expression (GNU extn.)
 };
 
 enum
@@ -149,6 +150,7 @@ typedef struct Node
   struct Node *rhs;  // right-hand side
   int val;           // Number literal
   struct Node *expr; // "return" or expresson stmt
+  struct Node *stmt; // Statement expression
   Vector *stmts;     // Compound statement
 
   char *name;
