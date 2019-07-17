@@ -138,4 +138,8 @@ try 45 'int main() { int i=0; int j=0; while (i<10) { j=j+i; i=i+1; } return j; 
 
 try 1 'int main() { ; return 1; }'
 
+#try 'a' 'int main() { char *p = "abc"; return p[0]; }'
+#try 'b' 'int main() { char *p = "abc"; return p[1]; }'
+#try 'c' 'int main() { char *p = "abc"; return p[2]; }' 
+
 echo OK

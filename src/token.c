@@ -1,8 +1,7 @@
 #include "zcc.h"
 
 // Tokenizer
-static Token *add_token(Vector *v, int ty, char *input)
-{
+static Token *add_token(Vector *v, int ty, char *input) {
   Token *t = calloc(1, sizeof(Token));
   t->ty = ty;
   t->input = input;
@@ -10,85 +9,89 @@ static Token *add_token(Vector *v, int ty, char *input)
   return t;
 }
 
-static struct
-{
+static struct {
   char *name;
   int ty;
 } symbols[] = {
-    {"char", TK_CHAR},
-    {"do", TK_DO},
-    {"else", TK_ELSE},
-    {"extern", TK_EXTERN},
-    {"for", TK_FOR},
-    {"if", TK_IF},
-    {"int", TK_INT},
-    {"return", TK_RETURN},
-    {"sizeof", TK_SIZEOF},
-    {"while", TK_WHILE},
-    {"&&", TK_LOGAND},
-    {"||", TK_LOGOR},
-    {"==", TK_EQ},
-    {"!=", TK_NE},
-    {NULL, 0},
+    {"char", TK_CHAR},     {"do", TK_DO},         {"else", TK_ELSE},
+    {"extern", TK_EXTERN}, {"for", TK_FOR},       {"if", TK_IF},
+    {"int", TK_INT},       {"return", TK_RETURN}, {"sizeof", TK_SIZEOF},
+    {"while", TK_WHILE},   {"&&", TK_LOGAND},     {"||", TK_LOGOR},
+    {"==", TK_EQ},         {"!=", TK_NE},         {NULL, 0},
 };
 
-static int read_string(StringBuilder *sb, char *p)
-{
+static char escaped[256] = {
+        ['a'] = '\a', ['b'] = '\b',   ['f'] = '\f',
+        ['n'] = '\n', ['r'] = '\r',   ['t'] = '\t',
+        ['v'] = '\v', ['e'] = '\033', ['E'] = '\033',
+};
+
+static int read_char(int *result, char *p) {
+  char *start = p;
+  if (!*p)
+    error("premature end of input");
+
+  if (*p != '\\') {
+    *result = *p++;
+  } else {
+    p++;
+    if (!*p)
+      error("premature end of input");
+    int esc = escaped[(unsigned)*p];
+    *result = esc ? esc : *p;
+    p++;
+  }
+
+  if (*p != '\'')
+    error("unclosed character literal");
+  p++;
+  return p - start;
+}
+
+static int read_string(StringBuilder *sb, char *p) {
   char *start = p;
 
-  while (*p != '"')
-  {
+  while (*p != '"') {
     if (!*p)
       error("premature end of input");
 
-    if (*p != '\\')
-    {
+    if (*p != '\\') {
       sb_add(sb, *p++);
       continue;
     }
 
     p++;
-    if (*p == 'a')
-      sb_add(sb, '\a');
-    else if (*p == 'b')
-      sb_add(sb, '\b');
-    else if (*p == 'f')
-      sb_add(sb, '\f');
-    else if (*p == 'n')
-      sb_add(sb, '\n');
-    else if (*p == 'r')
-      sb_add(sb, '\r');
-    else if (*p == 't')
-      sb_add(sb, '\t');
-    else if (*p == 'v')
-      sb_add(sb, '\v');
-    else if (*p == '\0')
-      error("premature end of input");
-    else
-      sb_add(sb, *p);
+    if (*p == '\0')
+      error("PREMATURE end of input");
+    int esc = escaped[(unsigned)*p];
+    sb_add(sb, esc ? esc : *p);
     p++;
   }
   return p - start + 1;
 }
 
 // Tokenized input is stored to this array.
-Vector *tokenize(char *p)
-{
+Vector *tokenize(char *p) {
   Vector *v = new_vec();
 
 loop:
-  while (*p)
-  {
+  while (*p) {
     // Skip whitespace
-    if (isspace(*p))
-    {
+    if (isspace(*p)) {
       p++;
       continue;
     }
 
+    // Character literal
+    if (*p == '\'') {
+      Token *t = add_token(v, TK_NUM, p);
+      p++;
+      p += read_char(&t->val, p);
+      continue;
+    }
+
     // String literal
-    if (*p == '"')
-    {
+    if (*p == '"') {
       Token *t = add_token(v, TK_STR, p);
       p++;
 
@@ -100,8 +103,7 @@ loop:
     }
 
     // Multi-letter symbol or keyword
-    for (int i = 0; symbols[i].name; i++)
-    {
+    for (int i = 0; symbols[i].name; i++) {
       char *name = symbols[i].name;
       int len = strlen(name);
       if (strncmp(p, name, len))
@@ -113,16 +115,14 @@ loop:
     }
 
     // Single-letter token
-    if (strchr("+-*/;=(),{}<>[]&", *p))
-    {
+    if (strchr("+-*/;=(),{}<>[]&", *p)) {
       add_token(v, *p, p);
       p++;
       continue;
     }
 
     // Identifier
-    if (isalpha(*p) || *p == '_')
-    {
+    if (isalpha(*p) || *p == '_') {
       int len = 1;
       while (isalpha(p[len]) || isdigit(p[len]) || p[len] == '_')
         len++;
@@ -134,8 +134,7 @@ loop:
     }
 
     // Number
-    if (isdigit(*p))
-    {
+    if (isdigit(*p)) {
       Token *t = add_token(v, TK_NUM, p);
       for (; isdigit(*p); p++)
         t->val = t->val * 10 + *p - '0';
