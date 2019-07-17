@@ -6,23 +6,16 @@ const char *argreg8[] = {"dil", "sil", "dl", "cl", "r8b", "r9b"};
 const char *argreg32[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 const char *argreg64[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
-static char *escape(char *s, int len)
-{
+static char *escape(char *s, int len) {
   char *buf = malloc(len * 4);
   char *p = buf;
-  for (int i = 0; i < len; i++)
-  {
-    if (s[i] == '\\')
-    {
+  for (int i = 0; i < len; i++) {
+    if (s[i] == '\\' || s[i] == '"') {
       *p++ = '\\';
-      *p++ = '\\';
-    }
-    else if (isgraph(s[i]) || s[i] == ' ')
-    {
       *p++ = s[i];
-    }
-    else
-    {
+    } else if (isgraph(s[i]) || s[i] == ' ') {
+      *p++ = s[i];
+    } else {
       sprintf(p, "\\%03o", s[i]);
       p += 4;
     }
@@ -31,15 +24,13 @@ static char *escape(char *s, int len)
   return buf;
 }
 
-void emit_cmp(IR *ir, char *insn)
-{
+void emit_cmp(IR *ir, char *insn) {
   printf("  cmp %s, %s\n", regs[ir->lhs], regs[ir->rhs]);
   printf("  %s %s\n", insn, regs8[ir->lhs]);
   printf("  movzb %s, %s\n", regs[ir->lhs], regs8[ir->lhs]);
 }
 
-void gen(Function *fn)
-{
+void gen(Function *fn) {
   char *ret = format(".Lend%d", label++);
 
   printf(".global %s\n", fn->name);
@@ -52,12 +43,10 @@ void gen(Function *fn)
   printf("  push r14\n");
   printf("  push r15\n");
 
-  for (int i = 0; i < fn->ir->len; i++)
-  {
+  for (int i = 0; i < fn->ir->len; i++) {
     IR *ir = fn->ir->data[i];
 
-    switch (ir->op)
-    {
+    switch (ir->op) {
     case IR_IMM:
       printf("  mov %s, %d\n", regs[ir->lhs], ir->rhs);
       break;
@@ -71,8 +60,7 @@ void gen(Function *fn)
       printf("  mov rax, %s\n", regs[ir->lhs]);
       printf("  jmp %s\n", ret);
       break;
-    case IR_CALL:
-    {
+    case IR_CALL: {
       for (int i = 0; i < ir->nargs; i++)
         printf("  mov %s, %s\n", argreg64[i], regs[ir->args[i]]);
 
@@ -101,12 +89,12 @@ void gen(Function *fn)
     case IR_LT:
       emit_cmp(ir, "setl");
       break;
+    case IR_JMP:
+      printf("  jmp .L%d\n", ir->lhs);
+      break;
     case IR_IF:
       printf("  cmp %s, 0\n", regs[ir->lhs]);
       printf("  jne .L%d\n", ir->rhs);
-      break;
-    case IR_JMP:
-      printf("  jmp .L%d\n", ir->lhs);
       break;
     case IR_UNLESS:
       printf("  cmp %s, 0\n", regs[ir->lhs]);
@@ -173,13 +161,11 @@ void gen(Function *fn)
   printf("  ret\n");
 }
 
-void gen_x86(Vector *globals, Vector *fns)
-{
+void gen_x86(Vector *globals, Vector *fns) {
   printf(".intel_syntax noprefix\n");
 
   printf(".data\n");
-  for (int i = 0; i < globals->len; i++)
-  {
+  for (int i = 0; i < globals->len; i++) {
     Var *var = globals->data[i];
     if (var->is_extern)
       continue;
