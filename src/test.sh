@@ -44,6 +44,10 @@ int **alloc_ptr_ptr(int x) {
   p = &q;
   return p;
 }
+
+int comment() {
+  return 1;
+}
 EOF
 
 try 1 'int main() { return 1; }'
