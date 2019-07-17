@@ -33,16 +33,8 @@ static char *escape(char *s, int len)
 
 void gen(Function *fn)
 {
-  printf(".data\n");
-  for (int i = 0; i < fn->globals->len; i++)
-  {
-    Var *var = fn->globals->data[i];
-    printf("%s:\n", var->name);
-    printf("  .ascii \"%s\"\n", escape(var->data, var->len));
-  }
   char *ret = format(".Lend%d", label++);
 
-  printf(".text\n");
   printf(".global %s\n", fn->name);
   printf("%s:\n", fn->name);
   printf("  push rbp\n");
@@ -106,7 +98,7 @@ void gen(Function *fn)
       printf("  je .L%d\n", ir->rhs);
       break;
     case IR_LOAD8:
-      printf("  mov %s, [%s]\n", regs[ir->lhs], regs[ir->rhs]);
+      printf("  mov %s, [%s]\n", regs8[ir->lhs], regs[ir->rhs]);
       printf("  movzb %s, %s\n", regs[ir->lhs], regs8[ir->lhs]);
       break;
     case IR_LOAD32:
@@ -120,11 +112,11 @@ void gen(Function *fn)
     case IR_STORE32:
       printf("  mov [%s], %s\n", regs[ir->lhs], regs32[ir->rhs]);
       break;
-    case IR_STORE8_ARG:
-      printf("  mov [rbp-%d], %s\n", ir->lhs, argreg8[ir->rhs]);
-      break;
     case IR_STORE64:
       printf("  mov [%s], %s\n", regs[ir->lhs], regs[ir->rhs]);
+      break;
+    case IR_STORE8_ARG:
+      printf("  mov [rbp-%d], %s\n", ir->lhs, argreg8[ir->rhs]);
       break;
     case IR_STORE32_ARG:
       printf("  mov [rbp-%d], %s\n", ir->lhs, argreg32[ir->rhs]);
@@ -166,10 +158,19 @@ void gen(Function *fn)
   printf("  ret\n");
 }
 
-void gen_x86(Vector *fns)
+void gen_x86(Vector *globals, Vector *fns)
 {
   printf(".intel_syntax noprefix\n");
 
+  printf(".data\n");
+  for (int i = 0; i < globals->len; i++)
+  {
+    Var *var = globals->data[i];
+    printf("%s:\n", var->name);
+    printf("  .ascii \"%s\"\n", escape(var->data, var->len));
+  }
+
+  printf(".text\n");
   for (int i = 0; i < fns->len; i++)
     gen(fns->data[i]);
 }
