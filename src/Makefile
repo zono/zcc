@@ -7,15 +7,9 @@ zcc: $(OBJS)
 
 $(OBJS): zcc.h
 
-test: zcc test/test.c
+test: zcc
 	./zcc -test
-
-	@./zcc "$$(gcc -E -P test/test.c)" > tmp-test.s
-	@echo 'int global_arr[1] = {5};' | gcc -xc -c -o tmp-test2.o -
-	@gcc -static -o tmp-test tmp-test.s tmp-test2.o
-	@./tmp-test
+	./test.sh
 
 clean:
-	rm -f zcc *.o *~ tmp* a.out test/*~
-
-.PHONY: test clean
+	rm -f zcc *.o *~ tmp*

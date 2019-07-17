@@ -134,4 +134,6 @@ try 5 'extern int global_arr[1]; int main() { return global_arr[0]; }'
 
 try 8 'int main() { return 3 + ({ return 5; }); }'
 
+try 45 'int main() { int i=0; int j=0; while (i<10) { j=j+i; i=i+1; } return j; }'
+
 echo OK
