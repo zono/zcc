@@ -86,6 +86,15 @@ static void check_lval(Node *node)
   error("not an lvalue: %d (%s)", op, node->name);
 }
 
+static Node *new_int(int val)
+{
+  Node *node = calloc(1, sizeof(Node));
+  node->op = ND_NUM;
+  node->ty = INT;
+  node->val = val;
+  return node;
+}
+
 static Node *walk(Node *node, Env *env, bool decay)
 {
   switch (node->op)
@@ -203,12 +212,12 @@ static Node *walk(Node *node, Env *env, bool decay)
   case ND_SIZEOF:
   {
     Node *expr = walk(node->expr, env, false);
-
-    Node *ret = calloc(1, sizeof(Node));
-    ret->op = ND_NUM;
-    ret->ty = INT;
-    ret->val = size_of(expr->ty);
-    return ret;
+    return new_int(size_of(expr->ty));
+  }
+  case ND_ALIGNOF:
+  {
+    Node *expr = walk(node->expr, env, false);
+    return new_int(align_of(expr->ty));
   }
   case ND_CALL:
     for (int i = 0; i < node->args->len; i++)
