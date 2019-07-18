@@ -1,5 +1,13 @@
 #include "zcc.h"
 
+// This is a recursive-decendent parser which constructs abstract
+// syntax tree from input tokens.
+//
+// This parser knows only about BNF of the C grammer and doesn't care
+// about its semantics. Therefor, some invalid expressions, such as
+// `1+2=3`, are accepted by this parser, but that's intentional.
+// Semantic erros are detected in a later pass.
+
 static Vector *tokens;
 static int pos;
 static Type int_ty = {INT, NULL};
@@ -60,7 +68,8 @@ static Node *primary()
 
   if (t->ty == '(')
   {
-    if (consume('{')) {
+    if (consume('{'))
+    {
       Node *node = calloc(1, sizeof(Node));
       node->op = ND_STMT_EXPR;
       node->body = compound_stmt();
@@ -210,9 +219,11 @@ static Node *equality()
   }
 }
 
-static Node *logand() {
+static Node *logand()
+{
   Node *lhs = equality();
-  for (;;) {
+  for (;;)
+  {
     Token *t = tokens->data[pos];
     if (t->ty != TK_LOGAND)
       return lhs;
@@ -451,9 +462,12 @@ static Node *toplevel()
   node->op = ND_VARDEF;
   node->ty = read_array(ty);
   node->name = name;
-  if (is_extern) {
+  if (is_extern)
+  {
     node->is_extern = true;
-  } else {
+  }
+  else
+  {
     node->data = calloc(1, size_of(node->ty));
     node->len = size_of(node->ty);
   }
