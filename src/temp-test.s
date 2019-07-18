@@ -9,7 +9,7 @@ var2:
 .L.str1:
   .ascii "0\000"
 .L.str2:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str3:
   .ascii "0\000"
 .L.str4:
@@ -17,7 +17,7 @@ var2:
 .L.str5:
   .ascii "1\000"
 .L.str6:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str7:
   .ascii "1\000"
 .L.str8:
@@ -25,7 +25,7 @@ var2:
 .L.str9:
   .ascii "1 + 1\000"
 .L.str10:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str11:
   .ascii "1 + 1\000"
 .L.str12:
@@ -33,7 +33,7 @@ var2:
 .L.str13:
   .ascii "2 * 3 + 4\000"
 .L.str14:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str15:
   .ascii "2 * 3 + 4\000"
 .L.str16:
@@ -41,7 +41,7 @@ var2:
 .L.str17:
   .ascii "2 * 3 + 4 * 5\000"
 .L.str18:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str19:
   .ascii "2 * 3 + 4 * 5\000"
 .L.str20:
@@ -49,7 +49,7 @@ var2:
 .L.str21:
   .ascii "50 / 10\000"
 .L.str22:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str23:
   .ascii "50 / 10\000"
 .L.str24:
@@ -57,7 +57,7 @@ var2:
 .L.str25:
   .ascii "6 * 3 / 2\000"
 .L.str26:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str27:
   .ascii "6 * 3 / 2\000"
 .L.str28:
@@ -65,7 +65,7 @@ var2:
 .L.str29:
   .ascii "(2 + 3) * (4 + 5)\000"
 .L.str30:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str31:
   .ascii "(2 + 3) * (4 + 5)\000"
 .L.str32:
@@ -73,7 +73,7 @@ var2:
 .L.str33:
   .ascii "1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16 + 17\000"
 .L.str34:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str35:
   .ascii "1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16 + 17\000"
 .L.str36:
@@ -81,7 +81,7 @@ var2:
 .L.str37:
   .ascii "({ int a=2; return a; })\000"
 .L.str38:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str39:
   .ascii "({ int a=2; return a; })\000"
 .L.str40:
@@ -89,7 +89,7 @@ var2:
 .L.str41:
   .ascii "({ int a=2; int b; b=3+2; return a*b; })\000"
 .L.str42:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str43:
   .ascii "({ int a=2; int b; b=3+2; return a*b; })\000"
 .L.str44:
@@ -97,7 +97,7 @@ var2:
 .L.str45:
   .ascii "({ if (1) return 2; return 3; })\000"
 .L.str46:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str47:
   .ascii "({ if (1) return 2; return 3; })\000"
 .L.str48:
@@ -105,7 +105,7 @@ var2:
 .L.str49:
   .ascii "({ if (0) return 2; return 3; })\000"
 .L.str50:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str51:
   .ascii "({ if (0) return 2; return 3; })\000"
 .L.str52:
@@ -113,7 +113,7 @@ var2:
 .L.str53:
   .ascii "({ if (1) return 2; else return 3; })\000"
 .L.str54:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str55:
   .ascii "({ if (1) return 2; else return 3; })\000"
 .L.str56:
@@ -121,7 +121,7 @@ var2:
 .L.str57:
   .ascii "({ if (0) return 2; else return 3; })\000"
 .L.str58:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str59:
   .ascii "({ if (0) return 2; else return 3; })\000"
 .L.str60:
@@ -129,7 +129,7 @@ var2:
 .L.str61:
   .ascii "plus(2, 3)\000"
 .L.str62:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str63:
   .ascii "plus(2, 3)\000"
 .L.str64:
@@ -137,7 +137,7 @@ var2:
 .L.str65:
   .ascii "one()\000"
 .L.str66:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str67:
   .ascii "one()\000"
 .L.str68:
@@ -145,7 +145,7 @@ var2:
 .L.str69:
   .ascii "one() + two()\000"
 .L.str70:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str71:
   .ascii "one() + two()\000"
 .L.str72:
@@ -153,7 +153,7 @@ var2:
 .L.str73:
   .ascii "mul(2, 3)\000"
 .L.str74:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str75:
   .ascii "mul(2, 3)\000"
 .L.str76:
@@ -161,7 +161,7 @@ var2:
 .L.str77:
   .ascii "add(1, 2, 3, 4, 5, 6)\000"
 .L.str78:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str79:
   .ascii "add(1, 2, 3, 4, 5, 6)\000"
 .L.str80:
@@ -169,7 +169,7 @@ var2:
 .L.str81:
   .ascii "0 || 0\000"
 .L.str82:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str83:
   .ascii "0 || 0\000"
 .L.str84:
@@ -177,7 +177,7 @@ var2:
 .L.str85:
   .ascii "1 || 0\000"
 .L.str86:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str87:
   .ascii "1 || 0\000"
 .L.str88:
@@ -185,7 +185,7 @@ var2:
 .L.str89:
   .ascii "0 || 1\000"
 .L.str90:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str91:
   .ascii "0 || 1\000"
 .L.str92:
@@ -193,7 +193,7 @@ var2:
 .L.str93:
   .ascii "1 || 1\000"
 .L.str94:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str95:
   .ascii "1 || 1\000"
 .L.str96:
@@ -201,7 +201,7 @@ var2:
 .L.str97:
   .ascii "0 && 0\000"
 .L.str98:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str99:
   .ascii "0 && 0\000"
 .L.str100:
@@ -209,7 +209,7 @@ var2:
 .L.str101:
   .ascii "1 && 0\000"
 .L.str102:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str103:
   .ascii "1 && 0\000"
 .L.str104:
@@ -217,7 +217,7 @@ var2:
 .L.str105:
   .ascii "0 && 1\000"
 .L.str106:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str107:
   .ascii "0 && 1\000"
 .L.str108:
@@ -225,7 +225,7 @@ var2:
 .L.str109:
   .ascii "1 && 1\000"
 .L.str110:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str111:
   .ascii "1 && 1\000"
 .L.str112:
@@ -233,7 +233,7 @@ var2:
 .L.str113:
   .ascii "0 < 0\000"
 .L.str114:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str115:
   .ascii "0 < 0\000"
 .L.str116:
@@ -241,7 +241,7 @@ var2:
 .L.str117:
   .ascii "1 < 0\000"
 .L.str118:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str119:
   .ascii "1 < 0\000"
 .L.str120:
@@ -249,7 +249,7 @@ var2:
 .L.str121:
   .ascii "0 < 1\000"
 .L.str122:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str123:
   .ascii "0 < 1\000"
 .L.str124:
@@ -257,7 +257,7 @@ var2:
 .L.str125:
   .ascii "0 > 0\000"
 .L.str126:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str127:
   .ascii "0 > 0\000"
 .L.str128:
@@ -265,7 +265,7 @@ var2:
 .L.str129:
   .ascii "0 > 1\000"
 .L.str130:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str131:
   .ascii "0 > 1\000"
 .L.str132:
@@ -273,7 +273,7 @@ var2:
 .L.str133:
   .ascii "1 > 0\000"
 .L.str134:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str135:
   .ascii "1 > 0\000"
 .L.str136:
@@ -281,7 +281,7 @@ var2:
 .L.str137:
   .ascii "4 == 5\000"
 .L.str138:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str139:
   .ascii "4 == 5\000"
 .L.str140:
@@ -289,7 +289,7 @@ var2:
 .L.str141:
   .ascii "5 == 5\000"
 .L.str142:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str143:
   .ascii "5 == 5\000"
 .L.str144:
@@ -297,7 +297,7 @@ var2:
 .L.str145:
   .ascii "4 != 5\000"
 .L.str146:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str147:
   .ascii "4 != 5\000"
 .L.str148:
@@ -305,7 +305,7 @@ var2:
 .L.str149:
   .ascii "5 != 5\000"
 .L.str150:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str151:
   .ascii "5 != 5\000"
 .L.str152:
@@ -313,7 +313,7 @@ var2:
 .L.str153:
   .ascii "({ int x=0; int y=0; do { y=y+x; x=x+1; } while (x < 10); return y; })\000"
 .L.str154:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str155:
   .ascii "({ int x=0; int y=0; do { y=y+x; x=x+1; } while (x < 10); return y; })\000"
 .L.str156:
@@ -321,7 +321,7 @@ var2:
 .L.str157:
   .ascii "({ int sum=0; int i; for (i=10; i<15; i=i+1) sum = sum + i; return sum; })\000"
 .L.str158:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str159:
   .ascii "({ int sum=0; int i; for (i=10; i<15; i=i+1) sum = sum + i; return sum; })\000"
 .L.str160:
@@ -329,7 +329,7 @@ var2:
 .L.str161:
   .ascii "({ int i=1; int j=1; for (int k=0; k<10; k=k+1) { int m=i+j; i=j; j=m; } return i; })\000"
 .L.str162:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str163:
   .ascii "({ int i=1; int j=1; for (int k=0; k<10; k=k+1) { int m=i+j; i=j; j=m; } return i; })\000"
 .L.str164:
@@ -337,7 +337,7 @@ var2:
 .L.str165:
   .ascii "({ int i=0; int j=0; while (i<10) { j=j+i; i=i+1; } return j; })\000"
 .L.str166:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str167:
   .ascii "({ int i=0; int j=0; while (i<10) { j=j+i; i=i+1; } return j; })\000"
 .L.str168:
@@ -345,7 +345,7 @@ var2:
 .L.str169:
   .ascii "({ int ary[2]; *ary=1; *(ary+1)=2; return *ary + *(ary+1); })\000"
 .L.str170:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str171:
   .ascii "({ int ary[2]; *ary=1; *(ary+1)=2; return *ary + *(ary+1); })\000"
 .L.str172:
@@ -353,7 +353,7 @@ var2:
 .L.str173:
   .ascii "({ int x; int *p = &x; x = 5; return *p; })\000"
 .L.str174:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str175:
   .ascii "({ int x; int *p = &x; x = 5; return *p; })\000"
 .L.str176:
@@ -361,7 +361,7 @@ var2:
 .L.str177:
   .ascii "({ int ary[2]; ary[0]=1; ary[1]=2; return ary[0] + ary[0+1]; })\000"
 .L.str178:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str179:
   .ascii "({ int ary[2]; ary[0]=1; ary[1]=2; return ary[0] + ary[0+1]; })\000"
 .L.str180:
@@ -369,7 +369,7 @@ var2:
 .L.str181:
   .ascii "({ int x; int *p = &x; x = 5; return p[0]; })\000"
 .L.str182:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str183:
   .ascii "({ int x; int *p = &x; x = 5; return p[0]; })\000"
 .L.str184:
@@ -377,7 +377,7 @@ var2:
 .L.str185:
   .ascii "({ char x; return sizeof x; })\000"
 .L.str186:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str187:
   .ascii "({ char x; return sizeof x; })\000"
 .L.str188:
@@ -385,7 +385,7 @@ var2:
 .L.str189:
   .ascii "({ int x; return sizeof(x); })\000"
 .L.str190:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str191:
   .ascii "({ int x; return sizeof(x); })\000"
 .L.str192:
@@ -393,7 +393,7 @@ var2:
 .L.str193:
   .ascii "({ int *x; return sizeof x; })\000"
 .L.str194:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str195:
   .ascii "({ int *x; return sizeof x; })\000"
 .L.str196:
@@ -401,7 +401,7 @@ var2:
 .L.str197:
   .ascii "({ int x[4]; return sizeof x; })\000"
 .L.str198:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str199:
   .ascii "({ int x[4]; return sizeof x; })\000"
 .L.str200:
@@ -409,7 +409,7 @@ var2:
 .L.str201:
   .ascii "({ char x; return _Alignof x; })\000"
 .L.str202:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str203:
   .ascii "({ char x; return _Alignof x; })\000"
 .L.str204:
@@ -417,7 +417,7 @@ var2:
 .L.str205:
   .ascii "({ int x; return _Alignof(x); })\000"
 .L.str206:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str207:
   .ascii "({ int x; return _Alignof(x); })\000"
 .L.str208:
@@ -425,7 +425,7 @@ var2:
 .L.str209:
   .ascii "({ int *x; return _Alignof x; })\000"
 .L.str210:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str211:
   .ascii "({ int *x; return _Alignof x; })\000"
 .L.str212:
@@ -433,7 +433,7 @@ var2:
 .L.str213:
   .ascii "({ int x[4]; return _Alignof x; })\000"
 .L.str214:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str215:
   .ascii "({ int x[4]; return _Alignof x; })\000"
 .L.str216:
@@ -441,7 +441,7 @@ var2:
 .L.str217:
   .ascii "({ int *x[4]; return _Alignof x; })\000"
 .L.str218:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str219:
   .ascii "({ int *x[4]; return _Alignof x; })\000"
 .L.str220:
@@ -449,7 +449,7 @@ var2:
 .L.str221:
   .ascii "({ char x = 5; return x; })\000"
 .L.str222:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str223:
   .ascii "({ char x = 5; return x; })\000"
 .L.str224:
@@ -457,7 +457,7 @@ var2:
 .L.str225:
   .ascii "({ int x = 0; char *p = &x; p[0] = 42; return x; })\000"
 .L.str226:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str227:
   .ascii "({ int x = 0; char *p = &x; p[0] = 42; return x; })\000"
 .L.str228:
@@ -467,7 +467,7 @@ var2:
 .L.str230:
   .ascii "({ char *p = \"abc\"; return p[0]; })\000"
 .L.str231:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str232:
   .ascii "({ char *p = \"abc\"; return p[0]; })\000"
 .L.str233:
@@ -477,7 +477,7 @@ var2:
 .L.str235:
   .ascii "({ char *p = \"abc\"; return p[1]; })\000"
 .L.str236:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str237:
   .ascii "({ char *p = \"abc\"; return p[1]; })\000"
 .L.str238:
@@ -487,7 +487,7 @@ var2:
 .L.str240:
   .ascii "({ char *p = \"abc\"; return p[2]; })\000"
 .L.str241:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str242:
   .ascii "({ char *p = \"abc\"; return p[2]; })\000"
 .L.str243:
@@ -497,7 +497,7 @@ var2:
 .L.str245:
   .ascii "({ char *p = \"abc\"; return p[3]; })\000"
 .L.str246:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str247:
   .ascii "({ char *p = \"abc\"; return p[3]; })\000"
 .L.str248:
@@ -505,7 +505,7 @@ var2:
 .L.str249:
   .ascii "({ int x = 1; { int x = 2; } return x; })\000"
 .L.str250:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str251:
   .ascii "({ int x = 1; { int x = 2; } return x; })\000"
 .L.str252:
@@ -513,7 +513,7 @@ var2:
 .L.str253:
   .ascii "var1\000"
 .L.str254:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str255:
   .ascii "var1\000"
 .L.str256:
@@ -521,7 +521,7 @@ var2:
 .L.str257:
   .ascii "({ var1 = 5; return var1; })\000"
 .L.str258:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str259:
   .ascii "({ var1 = 5; return var1; })\000"
 .L.str260:
@@ -529,7 +529,7 @@ var2:
 .L.str261:
   .ascii "sizeof(var2)\000"
 .L.str262:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str263:
   .ascii "sizeof(var2)\000"
 .L.str264:
@@ -537,7 +537,7 @@ var2:
 .L.str265:
   .ascii "({ var2[0] = 5; var2[4] = 10; return var2[0] + var2[4]; })\000"
 .L.str266:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str267:
   .ascii "({ var2[0] = 5; var2[4] = 10; return var2[0] + var2[4]; })\000"
 .L.str268:
@@ -545,7 +545,7 @@ var2:
 .L.str269:
   .ascii "global_arr[0]\000"
 .L.str270:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str271:
   .ascii "global_arr[0]\000"
 .L.str272:
@@ -553,7 +553,7 @@ var2:
 .L.str273:
   .ascii "({ return 3 + ({ return 5; }); })\000"
 .L.str274:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str275:
   .ascii "({ return 3 + ({ return 5; }); })\000"
 .L.str276:
@@ -561,10 +561,34 @@ var2:
 .L.str277:
   .ascii "({; return 1; })\000"
 .L.str278:
-  .ascii "%d: %s: %d expected, but got %d\n\000"
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
 .L.str279:
   .ascii "({; return 1; })\000"
 .L.str280:
+  .ascii "%s => %d\n\000"
+.L.str281:
+  .ascii "({ struct { int a; } x; return sizeof(x); })\000"
+.L.str282:
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
+.L.str283:
+  .ascii "({ struct { int a; } x; return sizeof(x); })\000"
+.L.str284:
+  .ascii "%s => %d\n\000"
+.L.str285:
+  .ascii "({ struct { char a; int b; } x; return sizeof(x); })\000"
+.L.str286:
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
+.L.str287:
+  .ascii "({ struct { char a; int b; } x; return sizeof(x); })\000"
+.L.str288:
+  .ascii "%s => %d\n\000"
+.L.str289:
+  .ascii "({ struct { char a; char b; int c; char d; } x; return sizeof(x); })\000"
+.L.str290:
+  .ascii "line %d: %s: %d expected, but got %d\n\000"
+.L.str291:
+  .ascii "({ struct { char a; char b; int c; char d; } x; return sizeof(x); })\000"
+.L.str292:
   .ascii "OK\n\000"
 .text
 .global one
@@ -707,7 +731,7 @@ add:
 main:
   push rbp
   mov rbp, rsp
-  sub rsp, 800
+  sub rsp, 848
   push r12
   push r13
   push r14
@@ -6283,7 +6307,226 @@ main:
   mov r10, 0
   cmp r10, 0
   jne .L264
-  lea r10, .L.str280
+.L268:
+  mov r10, 4
+  lea r11, [rbp-804]
+  mov [r11], r10d
+  mov r10, 4
+  mov r11, r10
+  jmp .L269
+.L269:
+  lea r10, [rbp-808]
+  mov [r10], r11d
+  lea r10, [rbp-804]
+  mov r10d, [r10]
+  lea r11, [rbp-808]
+  mov r11d, [r11]
+  cmp r10, r11
+  sete r10b
+  movzb r10, r10b
+  cmp r10, 0
+  je .L270
+  lea r10, stderr
+  mov r10, [r10]
+  lea r11, .L.str280
+  lea rbx, .L.str281
+  lea r12, [rbp-808]
+  mov r12d, [r12]
+  mov rdi, r10
+  mov rsi, r11
+  mov rdx, rbx
+  mov rcx, r12
+  push r10
+  push r11
+  mov rax, 0
+  call fprintf
+  pop r11
+  pop r10
+  mov r13, rax
+  jmp .L271
+.L270:
+  lea r10, stderr
+  mov r10, [r10]
+  lea r11, .L.str282
+  mov rbx, 129
+  lea r12, .L.str283
+  lea r13, [rbp-804]
+  mov r13d, [r13]
+  lea r14, [rbp-808]
+  mov r14d, [r14]
+  mov rdi, r10
+  mov rsi, r11
+  mov rdx, rbx
+  mov rcx, r12
+  mov r8, r13
+  mov r9, r14
+  push r10
+  push r11
+  mov rax, 0
+  call fprintf
+  pop r11
+  pop r10
+  mov r15, rax
+  mov r10, 1
+  mov rdi, r10
+  push r10
+  push r11
+  mov rax, 0
+  call exit
+  pop r11
+  pop r10
+  mov r11, rax
+.L271:
+  mov r10, 0
+  cmp r10, 0
+  jne .L268
+.L272:
+  mov r10, 8
+  lea r11, [rbp-816]
+  mov [r11], r10d
+  mov r10, 8
+  mov r11, r10
+  jmp .L273
+.L273:
+  lea r10, [rbp-820]
+  mov [r10], r11d
+  lea r10, [rbp-816]
+  mov r10d, [r10]
+  lea r11, [rbp-820]
+  mov r11d, [r11]
+  cmp r10, r11
+  sete r10b
+  movzb r10, r10b
+  cmp r10, 0
+  je .L274
+  lea r10, stderr
+  mov r10, [r10]
+  lea r11, .L.str284
+  lea rbx, .L.str285
+  lea r12, [rbp-820]
+  mov r12d, [r12]
+  mov rdi, r10
+  mov rsi, r11
+  mov rdx, rbx
+  mov rcx, r12
+  push r10
+  push r11
+  mov rax, 0
+  call fprintf
+  pop r11
+  pop r10
+  mov r13, rax
+  jmp .L275
+.L274:
+  lea r10, stderr
+  mov r10, [r10]
+  lea r11, .L.str286
+  mov rbx, 130
+  lea r12, .L.str287
+  lea r13, [rbp-816]
+  mov r13d, [r13]
+  lea r14, [rbp-820]
+  mov r14d, [r14]
+  mov rdi, r10
+  mov rsi, r11
+  mov rdx, rbx
+  mov rcx, r12
+  mov r8, r13
+  mov r9, r14
+  push r10
+  push r11
+  mov rax, 0
+  call fprintf
+  pop r11
+  pop r10
+  mov r15, rax
+  mov r10, 1
+  mov rdi, r10
+  push r10
+  push r11
+  mov rax, 0
+  call exit
+  pop r11
+  pop r10
+  mov r11, rax
+.L275:
+  mov r10, 0
+  cmp r10, 0
+  jne .L272
+.L276:
+  mov r10, 12
+  lea r11, [rbp-832]
+  mov [r11], r10d
+  mov r10, 12
+  mov r11, r10
+  jmp .L277
+.L277:
+  lea r10, [rbp-836]
+  mov [r10], r11d
+  lea r10, [rbp-832]
+  mov r10d, [r10]
+  lea r11, [rbp-836]
+  mov r11d, [r11]
+  cmp r10, r11
+  sete r10b
+  movzb r10, r10b
+  cmp r10, 0
+  je .L278
+  lea r10, stderr
+  mov r10, [r10]
+  lea r11, .L.str288
+  lea rbx, .L.str289
+  lea r12, [rbp-836]
+  mov r12d, [r12]
+  mov rdi, r10
+  mov rsi, r11
+  mov rdx, rbx
+  mov rcx, r12
+  push r10
+  push r11
+  mov rax, 0
+  call fprintf
+  pop r11
+  pop r10
+  mov r13, rax
+  jmp .L279
+.L278:
+  lea r10, stderr
+  mov r10, [r10]
+  lea r11, .L.str290
+  mov rbx, 131
+  lea r12, .L.str291
+  lea r13, [rbp-832]
+  mov r13d, [r13]
+  lea r14, [rbp-836]
+  mov r14d, [r14]
+  mov rdi, r10
+  mov rsi, r11
+  mov rdx, rbx
+  mov rcx, r12
+  mov r8, r13
+  mov r9, r14
+  push r10
+  push r11
+  mov rax, 0
+  call fprintf
+  pop r11
+  pop r10
+  mov r15, rax
+  mov r10, 1
+  mov rdi, r10
+  push r10
+  push r11
+  mov rax, 0
+  call exit
+  pop r11
+  pop r10
+  mov r11, rax
+.L279:
+  mov r10, 0
+  cmp r10, 0
+  jne .L276
+  lea r10, .L.str292
   mov rdi, r10
   push r10
   push r11

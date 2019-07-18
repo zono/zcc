@@ -28,19 +28,16 @@ static IR *add(int op, int lhs, int rhs)
 }
 
 static void kill(int r) { add(IR_KILL, r, -1); }
-
 static void label(int x) { add(IR_LABEL, x, -1); }
-
 static int gen_expr(Node *node);
 
 static int choose_insn(Node *node, int op8, int op32, int op64)
 {
-  int sz = size_of(node->ty);
-  if (sz == 1)
+  if (node->ty->size == 1)
     return op8;
-  if (sz == 4)
+  if (node->ty->size == 4)
     return op32;
-  assert(sz == 8);
+  assert(node->ty->size == 8);
   return op64;
 }
 
@@ -117,13 +114,9 @@ static int gen_expr(Node *node)
     return r;
   }
   case ND_EQ:
-  {
     return gen_binop(IR_EQ, node);
-  }
   case ND_NE:
-  {
     return gen_binop(IR_NE, node);
-  }
   case ND_LOGAND:
   {
     int x = nlabel++;
@@ -222,7 +215,7 @@ static int gen_expr(Node *node)
 
     int rhs = gen_expr(node->rhs);
     int r = nreg++;
-    add(IR_IMM, r, size_of(node->lhs->ty->ptr_to));
+    add(IR_IMM, r, node->lhs->ty->ptr_to->size);
     add(IR_MUL, rhs, r);
     kill(r);
 

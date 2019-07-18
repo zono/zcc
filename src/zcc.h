@@ -51,6 +51,8 @@ char *sb_get(StringBuilder *sb);
 typedef struct Type
 {
   int ty;
+  int size;
+  int align;
 
   // Pointer
   struct Type *ptr_to;
@@ -58,12 +60,15 @@ typedef struct Type
   // Array
   struct Type *ary_of;
   int len;
+
+  // Struct
+  Vector *members;
+  int offset;
 } Type;
 
 Type *ptr_to(Type *base);
 Type *ary_of(Type *base, int len);
-int size_of(Type *ty);
-int align_of(Type *ty);
+Type *struct_of(Vector *members);
 int roundup(int x, int align);
 
 /// util_test.c
@@ -80,6 +85,7 @@ enum
   TK_EXTERN,    // "extern"
   TK_INT,       // "int"
   TK_CHAR,      // "char"
+  TK_STRUCT,    // "struct"
   TK_IF,        // "if"
   TK_ELSE,      // "else"
   TK_FOR,       // "for"
@@ -117,6 +123,7 @@ enum
   ND_NUM = 256, // Number literal
   ND_STR,       // String literal
   ND_IDENT,     // Identifier
+  ND_STRUCT,    // Struct
   ND_VARDEF,    // Variable definition
   ND_LVAR,      // Local variable reference
   ND_GVAR,      // Global variable reference
@@ -146,6 +153,7 @@ enum
   CHAR,
   PTR,
   ARY,
+  STRUCT,
 };
 
 typedef struct Node
@@ -164,6 +172,9 @@ typedef struct Node
   bool is_extern;
   char *data;
   int len;
+
+  // Struct
+  Vector *members;
 
   // "if" ( cond ) then "else" els
   // "for" ( init; cond; inc ) body

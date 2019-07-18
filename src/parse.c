@@ -10,8 +10,6 @@
 
 static Vector *tokens;
 static int pos;
-static Type int_ty = {INT, NULL};
-static Type char_ty = {CHAR, NULL};
 static Node null_stmt = {ND_NULL};
 
 static Node *assign();
@@ -24,6 +22,18 @@ static void expect(int ty)
   pos++;
 }
 
+static Type *new_prim_ty(int ty, int size)
+{
+  Type *ret = calloc(1, sizeof(Type));
+  ret->ty = ty;
+  ret->size = size;
+  ret->align = size;
+  return ret;
+}
+
+static Type *char_ty() { return new_prim_ty(CHAR, 1); }
+static Type *int_ty() { return new_prim_ty(INT, 4); }
+
 static bool consume(int ty)
 {
   Token *t = tokens->data[pos];
@@ -33,13 +43,40 @@ static bool consume(int ty)
   return true;
 }
 
-static Type *get_type()
+static bool is_typename()
 {
   Token *t = tokens->data[pos];
+  return t->ty == TK_INT || t->ty == TK_CHAR || t->ty == TK_STRUCT;
+}
+
+static Node *decl();
+
+static Type *read_type()
+{
+  Token *t = tokens->data[pos];
+
   if (t->ty == TK_INT)
-    return &int_ty;
+  {
+    pos++;
+    return int_ty();
+  }
+
   if (t->ty == TK_CHAR)
-    return &char_ty;
+  {
+    pos++;
+    return char_ty();
+  }
+
+  if (t->ty == TK_STRUCT)
+  {
+    pos++;
+    expect('{');
+    Vector *members = new_vec();
+    while (!consume('}'))
+      vec_push(members, decl());
+    return struct_of(members);
+  }
+
   return NULL;
 }
 
@@ -85,7 +122,7 @@ static Node *primary()
 
   if (t->ty == TK_NUM)
   {
-    node->ty = &int_ty;
+    node->ty = int_ty();
     node->op = ND_NUM;
     node->val = t->val;
     return node;
@@ -93,7 +130,7 @@ static Node *primary()
 
   if (t->ty == TK_STR)
   {
-    node->ty = ary_of(&char_ty, strlen(t->str));
+    node->ty = ary_of(char_ty(), strlen(t->str));
     node->op = ND_STR;
     node->data = t->str;
     node->len = t->len;
@@ -258,10 +295,9 @@ static Node *assign()
 static Type *type()
 {
   Token *t = tokens->data[pos];
-  Type *ty = get_type();
+  Type *ty = read_type();
   if (!ty)
     error("typename expected, but got %s", t->input);
-  pos++;
 
   while (consume('*'))
     ty = ptr_to(ty);
@@ -342,6 +378,7 @@ static Node *stmt()
   {
   case TK_INT:
   case TK_CHAR:
+  case TK_STRUCT:
     return decl();
   case TK_IF:
     pos++;
@@ -359,7 +396,7 @@ static Node *stmt()
     pos++;
     node->op = ND_FOR;
     expect('(');
-    if (get_type())
+    if (is_typename())
       node->init = decl();
     else
       node->init = expr_stmt();
@@ -470,8 +507,8 @@ static Node *toplevel()
   }
   else
   {
-    node->data = calloc(1, size_of(node->ty));
-    node->len = size_of(node->ty);
+    node->data = calloc(1, node->ty->size);
+    node->len = node->ty->size;
   }
   expect(';');
   return node;
