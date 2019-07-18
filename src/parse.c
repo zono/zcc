@@ -48,6 +48,7 @@ static Type *new_prim_ty(int ty, int size)
   return ret;
 }
 
+static Type *void_ty() { return new_prim_ty(VOID, 0); }
 static Type *char_ty() { return new_prim_ty(CHAR, 1); }
 static Type *int_ty() { return new_prim_ty(INT, 4); }
 
@@ -65,39 +66,35 @@ static bool is_typename()
   Token *t = tokens->data[pos];
   if (t->ty == TK_IDENT)
     return map_exists(env->typedefs, t->name);
-  return t->ty == TK_INT || t->ty == TK_CHAR || t->ty == TK_STRUCT;
+  return t->ty == TK_INT || t->ty == TK_CHAR || t->ty == TK_VOID ||
+         t->ty == TK_STRUCT;
 }
 
 static Node *decl();
 
 static Type *read_type()
 {
-  Token *t = tokens->data[pos];
+  Token *t = tokens->data[pos++];
 
   if (t->ty == TK_IDENT)
   {
     Type *ty = map_get(env->typedefs, t->name);
-    if (ty)
-      pos++;
+    if (!ty)
+      pos--;
     return ty;
   }
 
   if (t->ty == TK_INT)
-  {
-    pos++;
     return int_ty();
-  }
 
   if (t->ty == TK_CHAR)
-  {
-    pos++;
     return char_ty();
-  }
+
+  if (t->ty == TK_VOID)
+    return void_ty();
 
   if (t->ty == TK_STRUCT)
   {
-    pos++;
-
     char *tag = NULL;
     Token *t = tokens->data[pos];
     if (t->ty == TK_IDENT)
@@ -131,6 +128,7 @@ static Type *read_type()
     return struct_of(members);
   }
 
+  pos--;
   return NULL;
 }
 
@@ -258,7 +256,6 @@ static Node *postfix()
       expect(']');
       continue;
     }
-
     return lhs;
   }
 }
@@ -424,6 +421,8 @@ static Node *decl()
 
   // Read the second half of type name (e.g. `[3][5]`).
   node->ty = read_array(node->ty);
+  if (node->ty->ty == VOID)
+    error("void variable: %s", node->name);
 
   // Read an initializer.
   if (consume('='))
@@ -523,11 +522,8 @@ static Node *stmt()
     pos++;
     node->op = ND_COMP_STMT;
     node->stmts = new_vec();
-
-    env = new_env(env);
     while (!consume('}'))
       vec_push(node->stmts, stmt());
-    env = env->next;
     return node;
   case ';':
     pos++;
@@ -545,8 +541,10 @@ static Node *compound_stmt()
   node->op = ND_COMP_STMT;
   node->stmts = new_vec();
 
+  env = new_env(env);
   while (!consume('}'))
     vec_push(node->stmts, stmt());
+  env = env->next;
   return node;
 }
 
