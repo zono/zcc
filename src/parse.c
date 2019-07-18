@@ -10,6 +10,7 @@
 
 typedef struct Env
 {
+  Map *typedefs;
   Map *tags;
   struct Env *next;
 } Env;
@@ -22,6 +23,7 @@ static Node null_stmt = {ND_NULL};
 static Env *new_env(Env *next)
 {
   Env *env = calloc(1, sizeof(Env));
+  env->typedefs = new_map();
   env->tags = new_map();
   env->next = next;
   return env;
@@ -61,6 +63,8 @@ static bool consume(int ty)
 static bool is_typename()
 {
   Token *t = tokens->data[pos];
+  if (t->ty == TK_IDENT)
+    return map_exists(env->typedefs, t->name);
   return t->ty == TK_INT || t->ty == TK_CHAR || t->ty == TK_STRUCT;
 }
 
@@ -69,6 +73,14 @@ static Node *decl();
 static Type *read_type()
 {
   Token *t = tokens->data[pos];
+
+  if (t->ty == TK_IDENT)
+  {
+    Type *ty = map_get(env->typedefs, t->name);
+    if (ty)
+      pos++;
+    return ty;
+  }
 
   if (t->ty == TK_INT)
   {
@@ -443,6 +455,14 @@ static Node *stmt()
 
   switch (t->ty)
   {
+  case TK_TYPEDEF:
+  {
+    pos++;
+    Node *node = decl();
+    assert(node->name);
+    map_put(env->typedefs, node->name, node->ty);
+    return &null_stmt;
+  }
   case TK_INT:
   case TK_CHAR:
   case TK_STRUCT:
@@ -513,6 +533,8 @@ static Node *stmt()
     pos++;
     return &null_stmt;
   default:
+    if (is_typename())
+      return decl();
     return expr_stmt();
   }
 }

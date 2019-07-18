@@ -84,6 +84,7 @@ enum
   TK_IDENT,     // Identifier
   TK_ARROW,     // ->
   TK_EXTERN,    // "extern"
+  TK_TYPEDEF,   // "typedef"
   TK_INT,       // "int"
   TK_CHAR,      // "char"
   TK_STRUCT,    // "struct"

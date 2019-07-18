@@ -153,5 +153,7 @@ int main()
 
   printf("OK\n");
 
+  EXPECT(3, ({ typedef int foo; foo x = 3; return x; }));
+
   return 0;
 }
