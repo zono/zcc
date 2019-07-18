@@ -23,6 +23,12 @@ int var1;
 int var2[5];
 extern int global_arr[1];
 
+// Single-line comment test
+
+/***************************
+ * Multi-line comment test *
+ ***************************/
+
 int main() {
   EXPECT(0, 0);
   EXPECT(1, 1);
@@ -74,6 +80,8 @@ int main() {
   EXPECT(60, ({ int sum=0; int i; for (i=10; i<15; i=i+1) sum = sum + i; return sum;}));
   EXPECT(89, ({ int i=1; int j=1; for (int k=0; k<10; k=k+1) { int m=i+j; i=j; j=m; } return i;}));
 
+  EXPECT(45, ({ int i=0; int j=0; while (i<10) { j=j+i; i=i+1; } return j;}));
+
   EXPECT(3, ({ int ary[2]; *ary=1; *(ary+1)=2; return *ary + *(ary+1);}));
   EXPECT(5, ({ int x; int *p = &x; x = 5; return *p;}));
 
@@ -88,9 +96,9 @@ int main() {
   EXPECT(5, ({ char x = 5; return x; }));
   EXPECT(42, ({ int x = 0; char *p = &x; p[0] = 42; return x; }));
 
-  EXPECT(97, ({ char *p = "abc"; return p[0]; }));
-  EXPECT(98, ({ char *p = "abc"; return p[1]; }));
-  EXPECT(99, ({ char *p = "abc"; return p[2]; }));
+  EXPECT('a', ({ char *p = "abc"; return p[0]; }));
+  EXPECT('b', ({ char *p = "abc"; return p[1]; }));
+  EXPECT('c', ({ char *p = "abc"; return p[2]; }));
   EXPECT(0, ({ char *p = "abc"; return p[3]; }));
 
   EXPECT(1, ({ int x = 1; { int x = 2; } return x; }));
@@ -102,6 +110,7 @@ int main() {
   EXPECT(5, global_arr[0]);
 
   EXPECT(8, ({ return 3 + ({ return 5; }); }));
+  EXPECT(1, ({; return 1; }));
 
   printf("OK\n");
   return 0;

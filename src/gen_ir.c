@@ -1,11 +1,11 @@
 #include "zcc.h"
 
-// zcc's code generation is two-pass. In the first pass, abstract
+// 9cc's code generation is two-pass. In the first pass, abstract
 // syntax trees are compiled to IR (intermediate representation).
 //
 // IR resembles the real x86-64 instruction set, but it has infinite
 // number of registers. We don't try too hard to reuse registers in
-// this pass. Instead, we "kill" registers to mark them as  dead when
+// this pass. Instead, we "kill" registers to mark them as dead when
 // we are done with them and use new registers.
 //
 // Such infinite number of registers are mapped to a finite registers
@@ -37,7 +37,7 @@ IRInfo irinfo[] = {
     [IR_STORE32_ARG] = {"STORE32_ARG", IR_TY_IMM_IMM},
     [IR_STORE64_ARG] = {"STORE64_ARG", IR_TY_IMM_IMM},
     [IR_SUB] = {"SUB", IR_TY_REG_REG},
-    [IR_BPREL] = {"SUB", IR_TY_REG_IMM},
+    [IR_BPREL] = {"BPREL", IR_TY_REG_IMM},
     [IR_IF] = {"IF", IR_TY_REG_LABEL},
     [IR_UNLESS] = {"UNLESS", IR_TY_REG_LABEL},
 };
@@ -118,13 +118,13 @@ static void label(int x) { add(IR_LABEL, x, -1); }
 
 static int gen_expr(Node *node);
 
-// In C, all expression that can be written on the left-hand side of
-// the '=' operator mush have an address in memory. In other words, if
+// In C, all expressions that can be written on the left-hand side of
+// the '=' operator must have an address in memory. In other words, if
 // you can apply the '&' operator to take an address of some
 // expression E, you can assign E to a new value.
 //
 // Other expressions, such as `1+2`, cannot be written on the lhs of
-// '=', since they are just temporary values that don't have an address
+// '=', since they are just temporary values that don't have an address.
 //
 // The stuff that can be written on the lhs of '=' is called lvalue.
 // Other values are called rvalue. An lvalue is essentially an address.
@@ -135,7 +135,6 @@ static int gen_expr(Node *node);
 // conversion.
 //
 // This function evaluates a given node as an lvalue.
-
 static int gen_lval(Node *node)
 {
   if (node->op == ND_DEREF)

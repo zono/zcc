@@ -14,8 +14,7 @@
 noreturn void error(char *fmt, ...);
 char *format(char *fmt, ...);
 
-typedef struct
-{
+typedef struct {
   void **data;
   int capacity;
   int len;
@@ -24,8 +23,7 @@ typedef struct
 Vector *new_vec(void);
 void vec_push(Vector *v, void *elem);
 
-typedef struct
-{
+typedef struct {
   Vector *keys;
   Vector *vals;
 } Map;
@@ -35,8 +33,7 @@ void map_put(Map *map, char *key, void *val);
 void *map_get(Map *map, char *key);
 bool map_exists(Map *map, char *key);
 
-typedef struct
-{
+typedef struct {
   char *data;
   int capacity;
   int len;
@@ -47,8 +44,7 @@ void sb_add(StringBuilder *sb, char s);
 void sb_append(StringBuilder *sb, char *s);
 char *sb_get(StringBuilder *sb);
 
-typedef struct Type
-{
+typedef struct Type {
   int ty;
 
   // Pointer
@@ -62,6 +58,8 @@ typedef struct Type
 Type *ptr_to(Type *base);
 Type *ary_of(Type *base, int len);
 int size_of(Type *ty);
+int align_of(Type *ty);
+int roundup(int x, int align);
 
 /// util_test.c
 
@@ -69,8 +67,7 @@ void util_test();
 
 /// token.c
 
-enum
-{
+enum {
   TK_NUM = 256, // Number literal
   TK_STR,       // String literal
   TK_IDENT,     // Identifier
@@ -86,14 +83,13 @@ enum
   TK_NE,        // !=
   TK_LOGOR,     // ||
   TK_LOGAND,    // &&
-  TK_SIZEOF,    // "sizeof"
   TK_RETURN,    // "return"
+  TK_SIZEOF,    // "sizeof"
   TK_EOF,       // End marker
 };
 
 // Token type
-typedef struct
-{
+typedef struct {
   int ty;      // Token type
   int val;     // Number literal
   char *name;  // Identifier
@@ -108,8 +104,7 @@ Vector *tokenize(char *p);
 
 /// parse.c
 
-enum
-{
+enum {
   ND_NUM = 256, // Number literal
   ND_STR,       // String literal
   ND_IDENT,     // Identifier
@@ -130,21 +125,19 @@ enum
   ND_CALL,      // Function call
   ND_FUNC,      // Function definition
   ND_COMP_STMT, // Compound statement
-  ND_EXPR_STMT, // Expressions tatement
+  ND_EXPR_STMT, // Expression statement
   ND_STMT_EXPR, // Statement expression (GNU extn.)
   ND_NULL,      // Null statement
 };
 
-enum
-{
+enum {
   INT,
   CHAR,
   PTR,
   ARY,
 };
 
-typedef struct Node
-{
+typedef struct Node {
   int op;            // Node type
   Type *ty;          // C type
   struct Node *lhs;  // left-hand side
@@ -185,8 +178,7 @@ int size_of(Type *ty);
 
 /// sema.c
 
-typedef struct
-{
+typedef struct {
   Type *ty;
   bool is_local;
 
@@ -204,8 +196,7 @@ Vector *sema(Vector *nodes);
 
 /// gen_ir.c
 
-enum
-{
+enum {
   IR_ADD,
   IR_SUB,
   IR_MUL,
@@ -236,8 +227,7 @@ enum
   IR_NOP,
 };
 
-typedef struct
-{
+typedef struct {
   int op;
   int lhs;
   int rhs;
@@ -248,8 +238,7 @@ typedef struct
   int args[6];
 } IR;
 
-enum
-{
+enum {
   IR_TY_NOARG,
   IR_TY_REG,
   IR_TY_IMM,
@@ -263,18 +252,16 @@ enum
   IR_TY_CALL,
 };
 
-typedef struct
-{
+typedef struct {
   char *name;
   int ty;
 } IRInfo;
 
-typedef struct
-{
+typedef struct {
   char *name;
   int stacksize;
-  Vector *globals;
   Vector *ir;
+  Vector *globals;
 } Function;
 
 extern IRInfo irinfo[];

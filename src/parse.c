@@ -1,12 +1,12 @@
 #include "zcc.h"
 
-// This is a recursive-decendent parser which constructs abstract
+// This is a recursive-descendent parser which constructs abstract
 // syntax tree from input tokens.
 //
 // This parser knows only about BNF of the C grammer and doesn't care
-// about its semantics. Therefor, some invalid expressions, such as
+// about its semantics. Therefore, some invalid expressions, such as
 // `1+2=3`, are accepted by this parser, but that's intentional.
-// Semantic erros are detected in a later pass.
+// Semantic errors are detected in a later pass.
 
 static Vector *tokens;
 static int pos;
