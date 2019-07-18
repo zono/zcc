@@ -361,9 +361,7 @@ Vector *gen_ir(Vector *nodes)
       continue;
 
     assert(node->op == ND_FUNC);
-
     code = new_vec();
-    nreg = 1;
 
     for (int i = 0; i < node->args->len; i++)
     {
