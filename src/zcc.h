@@ -68,7 +68,6 @@ typedef struct Type
 
 Type *ptr_to(Type *base);
 Type *ary_of(Type *base, int len);
-Type *struct_of(Vector *members);
 int roundup(int x, int align);
 
 /// util_test.c
@@ -214,7 +213,6 @@ typedef struct Node
 } Node;
 
 Vector *parse(Vector *tokens);
-int size_of(Type *ty);
 
 /// sema.c
 
