@@ -198,5 +198,7 @@ int main()
 
   EXPECT(1, ({ int i=1; for (int i=5; i<10; i++); return i; }));
 
+  EXPECT(5, ({ int i=0; for (0; i < 10; i++) if (i==5) break; return i; }));
+
   return 0;
 }

@@ -25,8 +25,8 @@ typedef struct Env
   struct Env *next;
 } Env;
 
-static Env *env;
 static Vector *globals;
+static Env *env;
 static int str_label;
 static int stacksize;
 
@@ -101,6 +101,7 @@ static Node *walk(Node *node, bool decay)
   {
   case ND_NUM:
   case ND_NULL:
+  case ND_BREAK:
     return node;
   case ND_STR:
   {

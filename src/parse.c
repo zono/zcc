@@ -19,6 +19,7 @@ static Vector *tokens;
 static int pos;
 struct Env *env;
 static Node null_stmt = {ND_NULL};
+static Node break_stmt = {ND_BREAK};
 
 static Env *new_env(Env *next)
 {
@@ -603,6 +604,8 @@ static Node *stmt()
     expect(')');
     expect(';');
     return node;
+  case TK_BREAK:
+    return &break_stmt;
   case TK_RETURN:
     node->op = ND_RETURN;
     node->expr = expr();
