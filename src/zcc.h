@@ -250,6 +250,7 @@ enum
   IR_EQ,
   IR_NE,
   IR_LT,
+  IR_AND,
   IR_OR,
   IR_XOR,
   IR_JMP,

@@ -346,16 +346,29 @@ static Node *equality()
   }
 }
 
-static Node *bit_xor()
+static Node *bit_and()
 {
   Node *lhs = equality();
+  for (;;)
+  {
+    Token *t = tokens->data[pos];
+    if (t->ty != '&')
+      return lhs;
+    pos++;
+    lhs = new_binop('&', lhs, equality());
+  }
+}
+
+static Node *bit_xor()
+{
+  Node *lhs = bit_and();
   for (;;)
   {
     Token *t = tokens->data[pos];
     if (t->ty != '^')
       return lhs;
     pos++;
-    lhs = new_binop('^', lhs, equality());
+    lhs = new_binop('^', lhs, bit_and());
   }
 }
 
@@ -446,7 +459,7 @@ static Type *read_array(Type *ty)
   Vector *v = new_vec();
   while (consume('['))
   {
-    Node *len = primary();
+    Node *len = expr();
     if (len->op != ND_NUM)
       error("number expected");
     vec_push(v, len);
