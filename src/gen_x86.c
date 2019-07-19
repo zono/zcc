@@ -109,6 +109,9 @@ void gen(Function *fn)
     case IR_NE:
       emit_cmp(ir, "setne");
       break;
+    case IR_OR:
+      printf("  or %s, %s\n", regs[ir->lhs], regs[ir->rhs]);
+      break;
     case IR_LT:
       emit_cmp(ir, "setl");
       break;
