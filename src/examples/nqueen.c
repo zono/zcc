@@ -1,3 +1,10 @@
+
+// How to run:
+//
+//   $ ./zcc examples/nqueen.c > tmp-nqueen.s
+//   $ gcc -static -o tmp-nqueen tmp-nqueen.s
+//   $ ./tmp-nqueen
+
 int print_board(int *board)
 {
   for (int i = 0; i < 10; i = i + 1)
