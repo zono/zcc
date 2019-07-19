@@ -115,6 +115,14 @@ void gen(Function *fn)
     case IR_XOR:
       printf("  xor %s, %s\n", regs[ir->lhs], regs[ir->rhs]);
       break;
+    case IR_SHL:
+      printf("  mov cl, %s\n", regs8[ir->rhs]);
+      printf("  shl %s, cl\n", regs[ir->lhs]);
+      break;
+    case IR_SHR:
+      printf("  mov cl, %s\n", regs8[ir->rhs]);
+      printf("  shr %s, cl\n", regs[ir->lhs]);
+      break;
     case IR_LT:
       emit_cmp(ir, "setl");
       break;
