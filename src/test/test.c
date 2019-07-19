@@ -196,5 +196,7 @@ int main()
   EXPECT(4, ({ myint foo = 3; return sizeof(foo); }));
   EXPECT(1, ({ typedef struct foo_ foo; return 1; }));
 
+  EXPECT(1, ({ int i=1; for (int i=5; i<10; i++); return i; }));
+
   return 0;
 }
