@@ -83,6 +83,14 @@ int main()
   EXPECT(1, 4 != 5);
   EXPECT(0, 5 != 5);
 
+  EXPECT(1, 4 <= 5);
+  EXPECT(1, 5 <= 5);
+  EXPECT(0, 6 <= 5);
+
+  EXPECT(0, 4 >= 5);
+  EXPECT(1, 5 >= 5);
+  EXPECT(1, 6 >= 5);
+
   EXPECT(0, !1);
   EXPECT(1, !0);
 
@@ -97,7 +105,7 @@ int main()
   EXPECT(5, 6 ^ 3);
 
   EXPECT(2, 6 & 3);
-  //EXPECT(0, 6 & 0);
+  EXPECT(0, 6 & 0);
 
   EXPECT(45, ({ int x=0; int y=0; do { y=y+x; x=x+1; } while (x < 10); return y; }));
 
