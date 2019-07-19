@@ -319,11 +319,11 @@ static int gen_expr(Node *node)
 
 static void gen_stmt(Node *node)
 {
-  if (node->op == ND_NULL)
-    return;
-
-  if (node->op == ND_VARDEF)
+  switch (node->op)
   {
+  case ND_NULL:
+    return;
+  case ND_VARDEF:
     if (!node->init)
       return;
     int rhs = gen_expr(node->init);
@@ -333,9 +333,7 @@ static void gen_stmt(Node *node)
     kill(lhs);
     kill(rhs);
     return;
-  }
-
-  if (node->op == ND_IF)
+  case ND_IF:
   {
     if (node->els)
     {
@@ -360,8 +358,7 @@ static void gen_stmt(Node *node)
     label(x);
     return;
   }
-
-  if (node->op == ND_FOR)
+  case ND_FOR:
   {
     int x = nlabel++;
     int y = nlabel++;
@@ -377,8 +374,7 @@ static void gen_stmt(Node *node)
     label(y);
     return;
   }
-
-  if (node->op == ND_DO_WHILE)
+  case ND_DO_WHILE:
   {
     int x = nlabel++;
     label(x);
@@ -388,8 +384,7 @@ static void gen_stmt(Node *node)
     kill(r);
     return;
   }
-
-  if (node->op == ND_RETURN)
+  case ND_RETURN:
   {
     int r = gen_expr(node->expr);
 
@@ -406,21 +401,20 @@ static void gen_stmt(Node *node)
     kill(r);
     return;
   }
-
-  if (node->op == ND_EXPR_STMT)
+  case ND_EXPR_STMT:
   {
     kill(gen_expr(node->expr));
     return;
   }
-
-  if (node->op == ND_COMP_STMT)
+  case ND_COMP_STMT:
   {
     for (int i = 0; i < node->stmts->len; i++)
       gen_stmt(node->stmts->data[i]);
     return;
   }
-
-  error("unknown node: %d", node->op);
+  default:
+    error("unknown node: %d", node->op);
+  }
 }
 
 Vector *gen_ir(Vector *nodes)
