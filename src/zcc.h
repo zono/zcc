@@ -147,6 +147,7 @@ enum
   ND_LOGOR,     // ||
   ND_SHL,       // <<
   ND_SHR,       // >>
+  ND_MOD,       // %
   ND_RETURN,    // "return"
   ND_SIZEOF,    // "sizeof"
   ND_ALIGNOF,   // "_Alignof"
@@ -263,6 +264,7 @@ enum
   IR_XOR,
   IR_SHL,
   IR_SHR,
+  IR_MOD,
   IR_JMP,
   IR_IF,
   IR_UNLESS,
