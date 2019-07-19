@@ -253,10 +253,10 @@ static int gen_expr(Node *node)
     return gen_binop(IR_MUL, node);
   case '/':
     return gen_binop(IR_DIV, node);
-  case '<':
-    return gen_binop(IR_LT, node);
   case '%':
     return gen_binop(IR_MOD, node);
+  case '<':
+    return gen_binop(IR_LT, node);
   case ND_LE:
     return gen_binop(IR_LE, node);
   case '&':
@@ -326,6 +326,7 @@ static void gen_stmt(Node *node)
   case ND_NULL:
     return;
   case ND_VARDEF:
+  {
     if (!node->init)
       return;
     int rhs = gen_expr(node->init);
@@ -335,6 +336,7 @@ static void gen_stmt(Node *node)
     kill(lhs);
     kill(rhs);
     return;
+  }
   case ND_IF:
   {
     if (node->els)
@@ -369,11 +371,15 @@ static void gen_stmt(Node *node)
 
     gen_stmt(node->init);
     label(x);
-    int r = gen_expr(node->cond);
-    add(IR_UNLESS, r, y);
-    kill(r);
+    if (node->cond)
+    {
+      int r = gen_expr(node->cond);
+      add(IR_UNLESS, r, y);
+      kill(r);
+    }
     gen_stmt(node->body);
-    gen_stmt(node->inc);
+    if (node->inc)
+      gen_stmt(node->inc);
     add(IR_JMP, x, -1);
     label(y);
     label(break_label);
@@ -417,16 +423,12 @@ static void gen_stmt(Node *node)
     return;
   }
   case ND_EXPR_STMT:
-  {
     kill(gen_expr(node->expr));
     return;
-  }
   case ND_COMP_STMT:
-  {
     for (int i = 0; i < node->stmts->len; i++)
       gen_stmt(node->stmts->data[i]);
     return;
-  }
   default:
     error("unknown node: %d", node->op);
   }

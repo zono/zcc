@@ -200,5 +200,7 @@ int main()
 
   EXPECT(5, ({ int i=0; for (0; i < 10; i++) if (i==5) break; return i; }));
 
+  EXPECT(10, ({ int i=0; for (;;) { i++; if (i==10) break; } return i; }));
+
   return 0;
 }
