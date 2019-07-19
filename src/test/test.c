@@ -202,5 +202,9 @@ int main()
 
   EXPECT(10, ({ int i=0; for (;;) { i++; if (i==10) break; } return i; }));
 
+  EXPECT(1, ({ int ary[2]; ary[0]=1; ary[1]=2; int *p=ary; return *p++; }));
+
+  EXPECT(2, ({ int ary[2]; ary[0]=1; ary[1]=2; int *p=ary; return *++p; }));
+
   return 0;
 }
