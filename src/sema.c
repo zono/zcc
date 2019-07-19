@@ -82,9 +82,8 @@ static Node *maybe_decay(Node *base, bool decay)
 static void check_lval(Node *node)
 {
   int op = node->op;
-  if (op == ND_LVAR || op == ND_GVAR || op == ND_DEREF || op == ND_DOT)
-    return;
-  error("not an lvalue: %d (%s)", op, node->name);
+  if (op != ND_LVAR && op != ND_GVAR && op != ND_DEREF && op != ND_DOT)
+    error("not an lvalue: %d (%s)", op, node->name);
 }
 
 static Node *new_int(int val)
@@ -101,6 +100,7 @@ static Node *walk(Node *node, bool decay)
   switch (node->op)
   {
   case ND_NUM:
+  case ND_NULL:
     return node;
   case ND_STR:
   {
@@ -193,6 +193,7 @@ static Node *walk(Node *node, bool decay)
     Type *ty = node->expr->ty;
     if (!ty->members)
       error("incomplete type");
+
     for (int i = 0; i < ty->members->len; i++)
     {
       Node *m = ty->members->data[i];
@@ -292,8 +293,6 @@ static Node *walk(Node *node, bool decay)
   case ND_STMT_EXPR:
     node->body = walk(node->body, true);
     node->ty = &int_ty;
-    return node;
-  case ND_NULL:
     return node;
   default:
     assert(0 && "unknown node type");
