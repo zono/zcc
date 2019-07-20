@@ -1,6 +1,6 @@
 #include "zcc.h"
 
-void expect(int line, int expected, int actual)
+static void expect(int line, int expected, int actual)
 {
   if (expected == actual)
     return;

@@ -2,48 +2,40 @@
 
 // This pass generates x86-64 assembly from IR.
 
+char *regs[] = {"r10", "r11", "rbx", "r12", "r13", "r14", "r15"};
+char *regs8[] = {"r10b", "r11b", "bl", "r12b", "r13b", "r14b", "r15b"};
+char *regs32[] = {"r10d", "r11d", "ebx", "r12d", "r13d", "r14d", "r15d"};
+
+int nregs = sizeof(regs) / sizeof(*regs);
+
 static int nlabel;
 
-char *argreg8[] = {"dil", "sil", "dl", "cl", "r8b", "r9b"};
-char *argreg32[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
-char *argreg64[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+static char *argregs[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+static char *argregs8[] = {"dil", "sil", "dl", "cl", "r8b", "r9b"};
+static char *argregs32[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 
-static char *escape(char *s, int len)
-{
+static char *backslash_escape(char *s, int len) {
   static char escaped[256] = {
-      ['\b'] = 'b',
-      ['\f'] = 'f',
-      ['\n'] = 'n',
-      ['\r'] = 'r',
-      ['\t'] = 't',
-      ['\\'] = '\\',
-      ['\''] = '\'',
-      ['"'] = '"',
+          ['\b'] = 'b', ['\f'] = 'f',  ['\n'] = 'n',  ['\r'] = 'r',
+          ['\t'] = 't', ['\\'] = '\\', ['\''] = '\'', ['"'] = '"',
   };
 
   StringBuilder *sb = new_sb();
-  for (int i = 0; i < len; i++)
-  {
+  for (int i = 0; i < len; i++) {
     char esc = escaped[(unsigned)s[i]];
-    if (esc)
-    {
+    if (esc) {
       sb_add(sb, '\\');
       sb_add(sb, esc);
-    }
-    else if (isgraph(s[i]) || s[i] == ' ')
-    {
+    } else if (isgraph(s[i]) || s[i] == ' ') {
       sb_add(sb, s[i]);
-    }
-    else
-    {
+    } else {
       sb_append(sb, format("\\%03o", s[i]));
     }
   }
   return sb_get(sb);
 }
 
-static void emit(char *fmt, ...)
-{
+static void emit(char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   printf("\t");
@@ -51,15 +43,13 @@ static void emit(char *fmt, ...)
   printf("\n");
 }
 
-static void emit_cmp(char *insn, IR *ir)
-{
+static void emit_cmp(char *insn, IR *ir) {
   emit("cmp %s, %s", regs[ir->lhs], regs[ir->rhs]);
   emit("%s %s", insn, regs8[ir->lhs]);
   emit("movzb %s, %s", regs[ir->lhs], regs8[ir->lhs]);
 }
 
-static char *reg(int r, int size)
-{
+static char *reg(int r, int size) {
   if (size == 1)
     return regs8[r];
   if (size == 4)
@@ -68,18 +58,16 @@ static char *reg(int r, int size)
   return regs[r];
 }
 
-static char *argreg(int r, int size)
-{
+static char *argreg(int r, int size) {
   if (size == 1)
-    return argreg8[r];
+    return argregs8[r];
   if (size == 4)
-    return argreg32[r];
+    return argregs32[r];
   assert(size == 8);
-  return argreg64[r];
+  return argregs[r];
 }
 
-void gen(Function *fn)
-{
+void gen(Function *fn) {
   char *ret = format(".Lend%d", nlabel++);
 
   printf(".global %s\n", fn->name);
@@ -92,14 +80,12 @@ void gen(Function *fn)
   emit("push r14");
   emit("push r15");
 
-  for (int i = 0; i < fn->ir->len; i++)
-  {
+  for (int i = 0; i < fn->ir->len; i++) {
     IR *ir = fn->ir->data[i];
     int lhs = ir->lhs;
     int rhs = ir->rhs;
 
-    switch (ir->op)
-    {
+    switch (ir->op) {
     case IR_IMM:
       emit("mov %s, %d", regs[lhs], rhs);
       break;
@@ -113,10 +99,9 @@ void gen(Function *fn)
       emit("mov rax, %s", regs[lhs]);
       emit("jmp %s", ret);
       break;
-    case IR_CALL:
-    {
+    case IR_CALL: {
       for (int i = 0; i < ir->nargs; i++)
-        emit("mov %s, %s", argreg64[i], regs[ir->args[i]]);
+        emit("mov %s, %s", argregs[i], regs[ir->args[i]]);
 
       emit("push r10");
       emit("push r11");
@@ -201,16 +186,14 @@ void gen(Function *fn)
         emit("sub %s, %s", regs[lhs], regs[rhs]);
       break;
     case IR_MUL:
-      if (!ir->is_imm)
-      {
+      if (!ir->is_imm) {
         emit("mov rax, %s", regs[rhs]);
         emit("mul %s", regs[lhs]);
         emit("mov %s, rax", regs[lhs]);
         break;
       }
 
-      if (__builtin_popcount(rhs) == 1)
-      {
+      if (__builtin_popcount(rhs) == 1) {
         emit("shl %s, %d", regs[lhs], __builtin_ctz(rhs));
         break;
       }
@@ -248,18 +231,16 @@ void gen(Function *fn)
   emit("ret");
 }
 
-void gen_x86(Vector *globals, Vector *fns)
-{
+void gen_x86(Vector *globals, Vector *fns) {
   printf(".intel_syntax noprefix\n");
 
   printf(".data\n");
-  for (int i = 0; i < globals->len; i++)
-  {
+  for (int i = 0; i < globals->len; i++) {
     Var *var = globals->data[i];
     if (var->is_extern)
       continue;
     printf("%s:\n", var->name);
-    emit(".ascii \"%s\"", escape(var->data, var->len));
+    emit(".ascii \"%s\"", backslash_escape(var->data, var->len));
   }
 
   printf(".text\n");
