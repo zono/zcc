@@ -220,5 +220,8 @@ int main()
   EXPECT(3, ({ int x; int y; x=y=3; return x; }));
   EXPECT(3, ({ int x; int y; x=y=3; return y; }));
 
+  EXPECT(-1, ~0);
+  EXPECT(-4, ~3);
+
   return 0;
 }

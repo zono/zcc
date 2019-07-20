@@ -193,7 +193,7 @@ loop:
     }
 
     // Single-letter symbol
-    if (strchr("+-*/;=(),{}<>[]&.!?:|^%", *p))
+    if (strchr("+-*/;=(),{}<>[]&.!?:|^%~", *p))
     {
       add_token(v, *p, p);
       p++;
