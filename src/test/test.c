@@ -206,5 +206,16 @@ int main()
 
   EXPECT(2, ({ int ary[2]; ary[0]=1; ary[1]=2; int *p=ary; return *++p; }));
 
+  EXPECT(15, ({ int i=5; i*=3; return i; }));
+  EXPECT(1, ({ int i=5; i/=3; return i; }));
+  EXPECT(2, ({ int i=5; i%=3; return i; }));
+  EXPECT(8, ({ int i=5; i+=3; return i; }));
+  EXPECT(2, ({ int i=5; i-=3; return i; }));
+  EXPECT(40, ({ int i=5; i<<=3; return i; })); 
+  EXPECT(0, ({ int i=5; i>>=3; return i; }));
+  EXPECT(1, ({ int i=5; i&=3; return i; }));
+  EXPECT(6, ({ int i=5; i^=3; return i; }));
+  EXPECT(7, ({ int i=5; i|=3; return i; }));
+
   return 0;
 }

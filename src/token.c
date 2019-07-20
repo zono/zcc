@@ -19,6 +19,8 @@ static struct
   char *name;
   int ty;
 } symbols[] = {
+    {"<<=", TK_SHL_EQ},
+    {">>=", TK_SHR_EQ},
     {"!=", TK_NE},
     {"&&", TK_LOGAND},
     {"++", TK_INC},
@@ -35,8 +37,6 @@ static struct
     {"%=", TK_MOD_EQ},
     {"+=", TK_ADD_EQ},
     {"-=", TK_SUB_EQ},
-    {"<<=", TK_SHL_EQ},
-    {">>=", TK_SHR_EQ},
     {"&=", TK_BITAND_EQ},
     {"^=", TK_XOR_EQ},
     {"|=", TK_BITOR_EQ},
