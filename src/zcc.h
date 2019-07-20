@@ -32,7 +32,9 @@ typedef struct
 
 Map *new_map(void);
 void map_put(Map *map, char *key, void *val);
+void map_puti(Map *map, char *key, int val);
 void *map_get(Map *map, char *key);
+int map_geti(Map *map, char *key, int default_);
 bool map_exists(Map *map, char *key);
 
 typedef struct
@@ -138,7 +140,7 @@ enum
   ND_GVAR,      // Global variable reference
   ND_IF,        // "if"
   ND_FOR,       // "for"
-  ND_DO_WHILE,  // do ~ while
+  ND_DO_WHILE,  // do ... while
   ND_BREAK,     // break
   ND_ADDR,      // address-of operator ("&")
   ND_DEREF,     // pointer dereference ("*")
@@ -313,7 +315,6 @@ enum
   IR_TY_LABEL_ADDR,
   IR_TY_REG_REG,
   IR_TY_REG_IMM,
-  IR_TY_IMM_IMM,
   IR_TY_STORE_ARG,
   IR_TY_REG_LABEL,
   IR_TY_CALL,
