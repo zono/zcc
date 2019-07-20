@@ -35,16 +35,6 @@ static void jmp(int x) { add(IR_JMP, x, -1); }
 
 static int gen_expr(Node *node);
 
-static int choose_insn(Node *node, int op8, int op32, int op64)
-{
-  if (node->ty->size == 1)
-    return op8;
-  if (node->ty->size == 4)
-    return op32;
-  assert(node->ty->size == 8);
-  return op64;
-}
-
 static void load(Node *node, int dst, int src)
 {
   IR *ir = add(IR_LOAD, dst, src);
@@ -57,9 +47,10 @@ static void store(Node *node, int dst, int src)
   ir->size = node->ty->size;
 }
 
-static int store_arg_insn(Node *node)
+static void store_arg(Node *node, int bpoff, int argreg)
 {
-  return choose_insn(node, IR_STORE8_ARG, IR_STORE32_ARG, IR_STORE64_ARG);
+  IR *ir = add(IR_STORE_ARG, bpoff, argreg);
+  ir->size = node->ty->size;
 }
 
 // In C, all expressions that can be written on the left-hand side of
@@ -462,7 +453,7 @@ Vector *gen_ir(Vector *nodes)
     for (int i = 0; i < node->args->len; i++)
     {
       Node *arg = node->args->data[i];
-      add(store_arg_insn(arg), arg->offset, i);
+      store_arg(arg, arg->offset, i);
     }
 
     gen_stmt(node->body);
