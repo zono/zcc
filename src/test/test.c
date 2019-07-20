@@ -217,5 +217,8 @@ int main()
   EXPECT(6, ({ int i=5; i^=3; return i; }));
   EXPECT(7, ({ int i=5; i|=3; return i; }));
 
+  EXPECT(3, ({ int x; int y; x=y=3; return x; }));
+  EXPECT(3, ({ int x; int y; x=y=3; return y; }));
+
   return 0;
 }
