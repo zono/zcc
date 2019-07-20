@@ -164,8 +164,6 @@ enum
   ND_SHR,       // >>
   ND_MOD,       // %
   ND_NEG,       // -
-  ND_PRE_INC,   // pre ++
-  ND_PRE_DEC,   // pre --
   ND_POST_INC,  // post ++
   ND_POST_DEC,  // post --
   ND_MUL_EQ,    // *=
