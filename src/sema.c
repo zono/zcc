@@ -294,11 +294,6 @@ static Node *walk(Node *node, bool decay)
       node->args->data[i] = walk(node->args->data[i], true);
     node->ty = &int_ty;
     return node;
-  case ND_FUNC:
-    for (int i = 0; i < node->args->len; i++)
-      node->args->data[i] = walk(node->args->data[i], true);
-    node->body = walk(node->body, true);
-    return node;
   case ND_COMP_STMT:
   {
     env = new_env(env);
@@ -337,7 +332,11 @@ Vector *sema(Vector *nodes)
     assert(node->op == ND_FUNC);
 
     stacksize = 0;
-    walk(node, true);
+    
+    for (int i = 0; i < node->args->len; i++)
+      node->args->data[i] = walk(node->args->data[i], true);
+    node->body = walk(node->body, true);
+
     node->stacksize = stacksize;
   }
 
