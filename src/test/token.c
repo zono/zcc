@@ -4,8 +4,9 @@
 // because we are interested only in knowing wheter the tokenizer can
 // tokenize this file or not.
 
-// line comment\
-continules
+// a line comment\
+continue\
+to this line
 
 /*
 /* block comment
