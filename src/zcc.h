@@ -93,7 +93,6 @@ enum
   TK_CHAR,      // "char"
   TK_VOID,      // "void"
   TK_STRUCT,    // "struct"
-  ND_DECL,      // decaration
   TK_IF,        // "if"
   TK_ELSE,      // "else"
   TK_FOR,       // "for"
@@ -138,11 +137,17 @@ typedef struct
   char len;
 
   // For error reporting
+  char *buf;
+  char *filename;
   char *start;
 } Token;
 
-Vector *tokenize(char *p);
+Vector *tokenize(char *path, bool add_eof);
 noreturn void bad_token(Token *t, char *msg);
+
+/// preprocess.c
+
+Vector *preprocess(Vector *tokens);
 
 /// parse.c
 
@@ -152,6 +157,7 @@ enum
   ND_STR,       // String literal
   ND_IDENT,     // Identifier
   ND_STRUCT,    // Struct
+  ND_DECL,      // declaration
   ND_VARDEF,    // Variable definition
   ND_LVAR,      // Local variable reference
   ND_GVAR,      // Global variable reference
@@ -368,7 +374,3 @@ extern char *regs32[];
 extern int num_regs;
 
 void gen_x86(Vector *globals, Vector *fns);
-
-/// main.c
-
-char *filename;
