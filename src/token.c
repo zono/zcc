@@ -299,7 +299,6 @@ loop:
   add(TK_EOF, p);
 }
 
-/*
 static void remove_backslash_newline()
 {
   char *p = input_file;
@@ -312,7 +311,6 @@ static void remove_backslash_newline()
   }
   *p = '\0';
 }
-*/
 
 static void append(Token *x, Token *y)
 {
@@ -349,6 +347,7 @@ Vector *tokenize(char *p)
   keywords = keyword_map();
   input_file = p;
 
+  remove_backslash_newline();
   scan();
   join_string_literals();
   return tokens;
