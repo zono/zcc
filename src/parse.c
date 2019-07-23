@@ -32,7 +32,8 @@ static Env *new_env(Env *next)
 
 static Type *find_typedef(char *name)
 {
-  for (Env *e = env; e; e = e->next) {
+  for (Env *e = env; e; e = e->next)
+  {
     Type *ty = map_get(e->typedefs, name);
     if (ty)
       return ty;
@@ -42,7 +43,8 @@ static Type *find_typedef(char *name)
 
 static Type *find_tag(char *name)
 {
-  for (Env *e = env; e; e = e->next){
+  for (Env *e = env; e; e = e->next)
+  {
     Type *ty = map_get(e->tags, name);
     if (ty)
       return ty;
@@ -56,9 +58,16 @@ static Node *expr();
 static void expect(int ty)
 {
   Token *t = tokens->data[pos];
-  if (t->ty != ty)
-    error("%c (%d) expected, but got %c (%d)", ty, ty, t->ty, t->ty);
-  pos++;
+  if (t->ty == ty)
+  {
+    pos++;
+    return;
+  }
+
+  if (isprint(ty))
+    bad_token(t, format("%c expected", ty));
+  assert(ty == TK_WHILE);
+  bad_token(t, format("'while' expected", ty));
 }
 
 static Type *new_prim_ty(int ty, int size)
@@ -155,7 +164,7 @@ static Type *read_type()
     }
 
     if (!tag && !members)
-      error("bad struct definition");
+      bad_token(t, "bad struct definition");
 
     Type *ty = NULL;
     if (tag && !members)
@@ -212,7 +221,7 @@ static char *ident()
 {
   Token *t = tokens->data[pos++];
   if (t->ty != TK_IDENT)
-    error("identifier expected, but got %s", t->input);
+    bad_token(t, "identifier expected");
   return t->name;
 }
 
@@ -271,7 +280,7 @@ static Node *primary()
     return node;
   }
 
-  error("number expected, but got %s", t->input);
+  bad_token(t, "primary expression expected");
 }
 
 static Node *mul();
@@ -334,10 +343,12 @@ static Node *unary()
     return new_expr(ND_SIZEOF, unary());
   if (consume(TK_ALIGNOF))
     return new_expr(ND_ALIGNOF, unary());
+
   if (consume(TK_INC))
     return new_binop(ND_ADD_EQ, unary(), new_num(1));
   if (consume(TK_DEC))
     return new_binop(ND_SUB_EQ, unary(), new_num(1));
+
   return postfix();
 }
 
@@ -521,7 +532,7 @@ static Type *type()
   Token *t = tokens->data[pos];
   Type *ty = read_type();
   if (!ty)
-    error("typename expected, but got %s", t->input);
+    bad_token(t, "typename expected");
 
   while (consume('*'))
     ty = ptr_to(ty);
@@ -533,9 +544,10 @@ static Type *read_array(Type *ty)
   Vector *v = new_vec();
   while (consume('['))
   {
+    Token *t = tokens->data[pos];
     Node *len = expr();
     if (len->op != ND_NUM)
-      error("number expected");
+      bad_token(t, "number expected");
     vec_push(v, len);
     expect(']');
   }
@@ -559,9 +571,10 @@ static Node *decl()
   node->name = ident();
 
   // Read the second half of type name (e.g. `[3][5]`).
+  Token *t = tokens->data[pos];
   node->ty = read_array(node->ty);
   if (node->ty->ty == VOID)
-    error("void variable: %s", node->name);
+    bad_token(t, "void variable");
 
   // Read an initializer.
   if (consume('='))
@@ -695,12 +708,11 @@ static Node *toplevel()
   bool is_typedef = consume(TK_TYPEDEF);
   bool is_extern = consume(TK_EXTERN);
 
+  Token *t = tokens->data[pos];
+
   Type *ty = type();
   if (!ty)
-  {
-    Token *t = tokens->data[pos];
-    error("typename expected, but got %s", t->input);
-  }
+    bad_token(t, "typename expected");
 
   char *name = ident();
 
@@ -723,7 +735,7 @@ static Node *toplevel()
 
     expect('{');
     if (is_typedef)
-      error("typedef %s has function definition", name);
+      bad_token(t, "typedef %s has function definition");
     node->body = compound_stmt();
     return node;
   }
