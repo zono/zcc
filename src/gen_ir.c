@@ -319,7 +319,8 @@ static int gen_expr(Node *node)
     return gen_binop(IR_SHL, node);
   case ND_SHR:
     return gen_binop(IR_SHR, node);
-  case '~': {
+  case '~':
+  {
     int r = gen_expr(node->expr);
     add_imm(IR_XOR, r, -1);
     return r;
@@ -493,7 +494,7 @@ Vector *gen_ir(Vector *nodes)
   {
     Node *node = nodes->data[i];
 
-    if (node->op == ND_VARDEF)
+    if (node->op == ND_VARDEF || node->op == ND_DECL)
       continue;
 
     assert(node->op == ND_FUNC);

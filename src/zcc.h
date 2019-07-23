@@ -53,8 +53,8 @@ char *sb_get(StringBuilder *sb);
 typedef struct Type
 {
   int ty;
-  int size;
-  int align;
+  int size;  // sizeof
+  int align; // alignof
 
   // Pointer
   struct Type *ptr_to;
@@ -66,6 +66,9 @@ typedef struct Type
   // Struct
   Vector *members;
   int offset;
+
+  // Function
+  struct Type *returning;
 } Type;
 
 Type *ptr_to(Type *base);
@@ -90,6 +93,7 @@ enum
   TK_CHAR,      // "char"
   TK_VOID,      // "void"
   TK_STRUCT,    // "struct"
+  ND_DECL,      // decaration
   TK_IF,        // "if"
   TK_ELSE,      // "else"
   TK_FOR,       // "for"
@@ -198,6 +202,7 @@ enum
   PTR,
   ARY,
   STRUCT,
+  FUNC,
 };
 
 typedef struct Node

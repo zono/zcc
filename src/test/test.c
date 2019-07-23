@@ -1,5 +1,9 @@
 extern void *stderr;
 
+int printf();
+int fprintf();
+int exit();
+
 #define EXPECT(expected, expr)                                  \
   do                                                            \
   {                                                             \
@@ -28,6 +32,7 @@ int add(int a, int b, int c, int d, int e, int f) { return a + b + c + d + e + f
 int add2(int (*a)[2]) { return a[0][0] + a[1][0]; }
 int add3(int a[][2]) { return a[0][0] + a[1][0]; }
 int add4(int a[2][2]) { return a[0][0] + a[1][0]; }
+void nop() {}
 
 int var1;
 int var2[5];
