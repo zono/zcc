@@ -101,7 +101,7 @@ static bool is_typename()
          t->ty == TK_STRUCT;
 }
 
-static Node *decl();
+static Node *declaration();
 
 static void add_members(Type *ty, Vector *members)
 {
@@ -124,7 +124,7 @@ static void add_members(Type *ty, Vector *members)
   ty->size = roundup(off, ty->align);
 }
 
-static Type *read_type()
+static Type *decl_specifiers()
 {
   Token *t = tokens->data[pos++];
 
@@ -160,7 +160,7 @@ static Type *read_type()
     {
       members = new_vec();
       while (!consume('}'))
-        vec_push(members, decl());
+        vec_push(members, declaration());
     }
 
     if (!tag && !members)
@@ -185,8 +185,7 @@ static Type *read_type()
     return ty;
   }
 
-  pos--;
-  return NULL;
+  bad_token(t, "typename expected");
 }
 
 static Node *new_binop(int op, Node *lhs, Node *rhs)
@@ -527,18 +526,6 @@ static Node *expr()
   return new_binop(',', lhs, expr());
 }
 
-static Type *type()
-{
-  Token *t = tokens->data[pos];
-  Type *ty = read_type();
-  if (!ty)
-    bad_token(t, "typename expected");
-
-  while (consume('*'))
-    ty = ptr_to(ty);
-  return ty;
-}
-
 static Type *read_array(Type *ty)
 {
   Vector *v = new_vec();
@@ -559,37 +546,59 @@ static Type *read_array(Type *ty)
   return ty;
 }
 
-static Node *decl()
+static Node *declarator(Type *ty);
+
+static Node *direct_decl(Type *ty)
 {
-  Node *node = calloc(1, sizeof(Node));
-  node->op = ND_VARDEF;
+  Token *t = tokens->data[pos];
+  Node *node;
+  Type *placeholder = calloc(1, sizeof(Type));
 
-  // Read the first half of type name (e.g. `int *`).
-  node->ty = type();
-
-  // Read an identifier.
-  node->name = ident();
+  if (t->ty == TK_IDENT)
+  {
+    node = calloc(1, sizeof(Node));
+    node->op = ND_VARDEF;
+    node->ty = placeholder;
+    node->name = ident();
+  }
+  else if (consume('('))
+  {
+    node = declarator(placeholder);
+    expect(')');
+  }
+  else
+  {
+    bad_token(t, "bad direct-declarator");
+  }
 
   // Read the second half of type name (e.g. `[3][5]`).
-  Token *t = tokens->data[pos];
-  node->ty = read_array(node->ty);
-  if (node->ty->ty == VOID)
-    bad_token(t, "void variable");
+  *placeholder = *read_array(ty);
 
   // Read an initializer.
   if (consume('='))
     node->init = assign();
+  return node;
+}
+
+static Node *declarator(Type *ty)
+{
+  while (consume('*'))
+    ty = ptr_to(ty);
+  return direct_decl(ty);
+}
+
+static Node *declaration()
+{
+  Type *ty = decl_specifiers();
+  Node *node = declarator(ty);
   expect(';');
   return node;
 }
 
-static Node *param()
+static Node *param_declaration()
 {
-  Node *node = calloc(1, sizeof(Node));
-  node->op = ND_VARDEF;
-  node->ty = type();
-  node->name = ident();
-  return node;
+  Type *ty = decl_specifiers();
+  return declarator(ty);
 }
 
 static Node *expr_stmt()
@@ -608,7 +617,7 @@ static Node *stmt()
   {
   case TK_TYPEDEF:
   {
-    Node *node = decl();
+    Node *node = declaration();
     assert(node->name);
     map_put(env->typedefs, node->name, node->ty);
     return &null_stmt;
@@ -629,7 +638,7 @@ static Node *stmt()
     expect('(');
 
     if (is_typename())
-      node->init = decl();
+      node->init = declaration();
     else if (consume(';'))
       node->init = &null_stmt;
     else
@@ -685,7 +694,7 @@ static Node *stmt()
   default:
     pos--;
     if (is_typename())
-      return decl();
+      return declaration();
     return expr_stmt();
   }
 }
@@ -708,11 +717,9 @@ static Node *toplevel()
   bool is_typedef = consume(TK_TYPEDEF);
   bool is_extern = consume(TK_EXTERN);
 
-  Token *t = tokens->data[pos];
-
-  Type *ty = type();
-  if (!ty)
-    bad_token(t, "typename expected");
+  Type *ty = decl_specifiers();
+  while (consume('*'))
+    ty = ptr_to(ty);
 
   char *name = ident();
 
@@ -727,15 +734,16 @@ static Node *toplevel()
 
     if (!consume(')'))
     {
-      vec_push(node->args, param());
+      vec_push(node->args, param_declaration());
       while (consume(','))
-        vec_push(node->args, param());
+        vec_push(node->args, param_declaration());
       expect(')');
     }
 
+    Token *t = tokens->data[pos];
     expect('{');
     if (is_typedef)
-      bad_token(t, "typedef %s has function definition");
+      bad_token(t, "typedef has function definition");
     node->body = compound_stmt();
     return node;
   }
