@@ -42,6 +42,8 @@ int main()
   EXPECT(0, 0);
   EXPECT(1, 1);
   EXPECT(2, 1 + 1);
+  EXPECT(48879, 0xBEEF);
+  EXPECT(255, 0Xff);
   EXPECT(10, 2 * 3 + 4);
   EXPECT(26, 2 * 3 + 4 * 5);
   EXPECT(5, 50 / 10);
