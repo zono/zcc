@@ -22,7 +22,8 @@
 
 static Type int_ty = {INT, 4, 4};
 
-typedef struct Env {
+typedef struct Env
+{
   Map *vars;
   struct Env *next;
 } Env;
@@ -32,14 +33,16 @@ static Env *env;
 static int str_label;
 static int stacksize;
 
-static Env *new_env(Env *next) {
+static Env *new_env(Env *next)
+{
   Env *env = calloc(1, sizeof(Env));
   env->vars = new_map();
   env->next = next;
   return env;
 }
 
-static Var *new_global(Type *ty, char *name, char *data, int len) {
+static Var *new_global(Type *ty, char *name, char *data, int len)
+{
   Var *var = calloc(1, sizeof(Var));
   var->ty = ty;
   var->is_local = false;
@@ -49,8 +52,10 @@ static Var *new_global(Type *ty, char *name, char *data, int len) {
   return var;
 }
 
-static Var *find_var(char *name) {
-  for (Env *e = env; e; e = e->next) {
+static Var *find_var(char *name)
+{
+  for (Env *e = env; e; e = e->next)
+  {
     Var *var = map_get(e->vars, name);
     if (var)
       return var;
@@ -58,13 +63,15 @@ static Var *find_var(char *name) {
   return NULL;
 }
 
-static void swap(Node **p, Node **q) {
+static void swap(Node **p, Node **q)
+{
   Node *r = *p;
   *p = *q;
   *q = r;
 }
 
-static Node *maybe_decay(Node *base, bool decay) {
+static Node *maybe_decay(Node *base, bool decay)
+{
   if (!decay || base->ty->ty != ARY)
     return base;
 
@@ -75,13 +82,15 @@ static Node *maybe_decay(Node *base, bool decay) {
   return node;
 }
 
-static void check_lval(Node *node) {
+static void check_lval(Node *node)
+{
   int op = node->op;
   if (op != ND_LVAR && op != ND_GVAR && op != ND_DEREF && op != ND_DOT)
     error("not an lvalue: %d (%s)", op, node->name);
 }
 
-static Node *new_int(int val) {
+static Node *new_int(int val)
+{
   Node *node = calloc(1, sizeof(Node));
   node->op = ND_NUM;
   node->ty = INT;
@@ -89,7 +98,8 @@ static Node *new_int(int val) {
   return node;
 }
 
-static Node *scale_ptr(Node *node, Type *ty) {
+static Node *scale_ptr(Node *node, Type *ty)
+{
   Node *e = calloc(1, sizeof(Node));
   e->op = '*';
   e->lhs = node;
@@ -97,13 +107,16 @@ static Node *scale_ptr(Node *node, Type *ty) {
   return e;
 }
 
-static Node *walk(Node *node, bool decay) {
-  switch (node->op) {
+static Node *walk(Node *node, bool decay)
+{
+  switch (node->op)
+  {
   case ND_NUM:
   case ND_NULL:
   case ND_BREAK:
     return node;
-  case ND_STR: {
+  case ND_STR:
+  {
     // A string literal is converted to a reference to an anonymous
     // global variable of type char array.
     Var *var = new_global(node->ty, format(".L.str%d", str_label++), node->data,
@@ -116,12 +129,14 @@ static Node *walk(Node *node, bool decay) {
     ret->name = var->name;
     return maybe_decay(ret, decay);
   }
-  case ND_IDENT: {
+  case ND_IDENT:
+  {
     Var *var = find_var(node->name);
     if (!var)
       error("undefined variable: %s", node->name);
 
-    if (var->is_local) {
+    if (var->is_local)
+    {
       Node *ret = calloc(1, sizeof(Node));
       ret->op = ND_LVAR;
       ret->ty = var->ty;
@@ -135,7 +150,8 @@ static Node *walk(Node *node, bool decay) {
     ret->name = var->name;
     return maybe_decay(ret, decay);
   }
-  case ND_VARDEF: {
+  case ND_VARDEF:
+  {
     stacksize = roundup(stacksize, node->ty->align);
     stacksize += node->ty->size;
     node->offset = stacksize;
@@ -218,7 +234,8 @@ static Node *walk(Node *node, bool decay) {
     if (!ty->members)
       error("incomplete type");
 
-    for (int i = 0; i < ty->members->len; i++) {
+    for (int i = 0; i < ty->members->len; i++)
+    {
       Node *m = ty->members->data[i];
       if (strcmp(m->name, node->name))
         continue;
@@ -279,16 +296,18 @@ static Node *walk(Node *node, bool decay) {
       error("cannot dereference void pointer");
 
     node->ty = node->expr->ty->ptr_to;
-    return node;
+    return maybe_decay(node, decay);
   case ND_RETURN:
   case ND_EXPR_STMT:
     node->expr = walk(node->expr, true);
     return node;
-  case ND_SIZEOF: {
+  case ND_SIZEOF:
+  {
     Node *expr = walk(node->expr, false);
     return new_int(expr->ty->size);
   }
-  case ND_ALIGNOF: {
+  case ND_ALIGNOF:
+  {
     Node *expr = walk(node->expr, false);
     return new_int(expr->ty->align);
   }
@@ -297,7 +316,8 @@ static Node *walk(Node *node, bool decay) {
       node->args->data[i] = walk(node->args->data[i], true);
     node->ty = &int_ty;
     return node;
-  case ND_COMP_STMT: {
+  case ND_COMP_STMT:
+  {
     env = new_env(env);
     for (int i = 0; i < node->stmts->len; i++)
       node->stmts->data[i] = walk(node->stmts->data[i], true);
@@ -313,14 +333,17 @@ static Node *walk(Node *node, bool decay) {
   }
 }
 
-Vector *sema(Vector *nodes) {
+Vector *sema(Vector *nodes)
+{
   env = new_env(NULL);
   globals = new_vec();
 
-  for (int i = 0; i < nodes->len; i++) {
+  for (int i = 0; i < nodes->len; i++)
+  {
     Node *node = nodes->data[i];
 
-    if (node->op == ND_VARDEF) {
+    if (node->op == ND_VARDEF)
+    {
       Var *var = new_global(node->ty, node->name, node->data, node->len);
       var->is_extern = node->is_extern;
       vec_push(globals, var);
