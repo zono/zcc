@@ -138,7 +138,7 @@ typedef struct
 
   // For error reporting
   char *buf;
-  char *filename;
+  char *path;
   char *start;
 } Token;
 
