@@ -120,7 +120,8 @@ static bool is_ident(Token *t, char *s)
   return t->ty == TK_IDENT && !strcmp(t->name, s);
 }
 
-static void replace_params(Macro *m)
+// Replaces macro parameter tokens with TK_PARAM token.
+static void replace_macro_params(Macro *m)
 {
   Vector *params = m->params;
   Vector *tokens = m->tokens;
@@ -143,9 +144,14 @@ static void replace_params(Macro *m)
       continue;
     tokens->data[i] = new_param(n);
   }
+}
 
-  // Process '#' followed by a macro parameter.
+// Process '#' followed by a macro parameter with one token.
+static void replace_hash_ident(Macro *m)
+{
+  Vector *tokens = m->tokens;
   Vector *v = new_vec();
+
   int i = 0;
   for (; i < tokens->len - 1; i++)
   {
@@ -280,7 +286,7 @@ static void apply(Macro *m, Token *start)
     apply_funclike(m, start);
 }
 
-static void funclike_macro(char *name)
+static void define_funclike(char *name)
 {
   Macro *m = new_macro(FUNCLIKE, name);
   vec_push(m->params, ident("parameter name expected"));
@@ -290,10 +296,11 @@ static void funclike_macro(char *name)
     vec_push(m->params, ident("parameter name expected"));
   }
   m->tokens = read_until_eol();
-  replace_params(m);
+  replace_macro_params(m);
+  replace_hash_ident(m);
 }
 
-static void objlike_macro(char *name)
+static void define_objlike(char *name)
 {
   Macro *m = new_macro(OBJLIKE, name);
   m->tokens = read_until_eol();
@@ -303,8 +310,8 @@ static void define()
 {
   char *name = ident("macro name expected");
   if (consume('('))
-    return funclike_macro(name);
-  return objlike_macro(name);
+    return define_funclike(name);
+  return define_objlike(name);
 }
 
 static void include()
