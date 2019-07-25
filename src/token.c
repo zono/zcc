@@ -95,6 +95,12 @@ noreturn void bad_token(Token *t, char *msg)
   error(msg);
 }
 
+char *tokstr(Token *t)
+{
+  assert(t->start && t->end);
+  return strndup(t->start, t->end - t->start);
+}
+
 // Atomic unit in the grammar is called "token".
 // For example, `123`, `"abc"` and `while` are tokens.
 // The tokenizer splits an input string into tokens.
@@ -178,7 +184,7 @@ static char *block_comment(char *pos)
   for (char *p = pos + 2; *p; p++)
     if (!strncmp(p, "*/", 2))
       return p + 2;
-  print_line(ctx->buf, ctx->path, pos);
+  print_line(ctx->buf, ctx->path, ctx->pos);
   error("unclosed comment");
 }
 
@@ -202,8 +208,10 @@ static char *char_literal(char *p)
     p += 2;
   }
 
-  if (*p == '\'')
-    return p + 1;
+  if (*p != '\'')
+    goto err;
+  t->end = p + 1;
+  return p + 1;
 
 err:
   bad_token(t, "unclosed character literal");
@@ -235,6 +243,7 @@ static char *string_literal(char *p)
 
   t->str = sb_get(sb);
   t->len = sb->len;
+  t->end = p + 1;
   return p + 1;
 
 err:
@@ -251,6 +260,7 @@ static char *ident(char *p)
   int ty = map_geti(keywords, name, TK_IDENT);
   Token *t = add(ty, p);
   t->name = name;
+  t->end = p + len;
   return p + len;
 }
 
@@ -265,13 +275,22 @@ static char *hexadecimal(char *p)
   for (;;)
   {
     if ('0' <= *p && *p <= '9')
+    {
       t->val = t->val * 16 + *p++ - '0';
+    }
     else if ('a' <= *p && *p <= 'f')
+    {
       t->val = t->val * 16 + *p++ - 'a' + 10;
+    }
     else if ('A' <= *p && *p <= 'F')
+    {
       t->val = t->val * 16 + *p++ - 'A' + 10;
+    }
     else
+    {
+      t->end = p;
       return p;
+    }
   }
 }
 
@@ -280,6 +299,7 @@ static char *octal(char *p)
   Token *t = add(TK_NUM, p++);
   while ('0' <= *p && *p <= '7')
     t->val = t->val * 8 + *p++ - '0';
+  t->end = p;
   return p;
 }
 
@@ -288,6 +308,7 @@ static char *decimal(char *p)
   Token *t = add(TK_NUM, p);
   while (isdigit(*p))
     t->val = t->val * 10 + *p++ - '0';
+  t->end = p;
   return p;
 }
 
@@ -360,16 +381,18 @@ loop:
       if (strncmp(p, name, len))
         continue;
 
-      add(symbols[i].ty, p);
+      Token *t = add(symbols[i].ty, p);
       p += len;
+      t->end = p;
       goto loop;
     }
 
     // Single-letter symbol
     if (strchr("+-*/;=(),{}<>[]&.!?:|^%~#", *p))
     {
-      add(*p, p);
+      Token *t = add(*p, p);
       p++;
+      t->end = p;
       continue;
     }
 
@@ -415,7 +438,7 @@ static void remove_backslash_newline(char *p)
   *p = '\0';
 }
 
-static Vector *strip_newlines_tokens(Vector *tokens)
+static Vector *strip_newline_tokens(Vector *tokens)
 {
   Vector *v = new_vec();
   for (int i = 0; i < tokens->len; i++)
@@ -464,6 +487,7 @@ Vector *tokenize(char *path, bool add_eof)
   char *buf = read_file(path);
   canonicalize_newline(buf);
   remove_backslash_newline(buf);
+
   ctx = new_ctx(ctx, path, buf);
   scan();
   if (add_eof)
@@ -472,6 +496,6 @@ Vector *tokenize(char *path, bool add_eof)
   ctx = ctx->next;
 
   v = preprocess(v);
-  v = strip_newlines_tokens(v);
+  v = strip_newline_tokens(v);
   return join_string_literals(v);
 }

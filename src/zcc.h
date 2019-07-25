@@ -122,6 +122,7 @@ enum
   TK_RETURN,    // "return"
   TK_SIZEOF,    // "sizeof"
   TK_ALIGNOF,   // "_Alignof"
+  TK_PARAM,     // Function-like macro parameter
   TK_EOF,       // End marker
 };
 
@@ -136,14 +137,19 @@ typedef struct
   char *str;
   char len;
 
+  // For preprocessor
+  bool stringize;
+
   // For error reporting
   char *buf;
   char *path;
   char *start;
+  char *end;
 } Token;
 
 Vector *tokenize(char *path, bool add_eof);
 noreturn void bad_token(Token *t, char *msg);
+char *tokstr(Token *t);
 
 /// preprocess.c
 
