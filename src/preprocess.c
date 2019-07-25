@@ -4,8 +4,7 @@
 
 static Map *macros;
 
-typedef struct Context
-{
+typedef struct Context {
   Vector *input;
   Vector *output;
   int pos;
@@ -14,8 +13,7 @@ typedef struct Context
 
 static Context *ctx;
 
-static Context *new_ctx(Context *next, Vector *input)
-{
+static Context *new_ctx(Context *next, Vector *input) {
   Context *c = calloc(1, sizeof(Context));
   c->input = input;
   c->output = new_vec();
@@ -23,21 +21,18 @@ static Context *new_ctx(Context *next, Vector *input)
   return c;
 }
 
-enum
-{
+enum {
   OBJLIKE,
   FUNCLIKE,
 };
 
-typedef struct Macro
-{
+typedef struct Macro {
   int ty;
   Vector *tokens;
   Vector *params;
 } Macro;
 
-static Macro *new_macro(int ty, char *name)
-{
+static Macro *new_macro(int ty, char *name) {
   Macro *m = calloc(1, sizeof(Macro));
   m->ty = ty;
   m->tokens = new_vec();
@@ -46,51 +41,50 @@ static Macro *new_macro(int ty, char *name)
   return m;
 }
 
-static void append(Vector *v)
-{
+static void append(Vector *v) {
   for (int i = 0; i < v->len; i++)
     vec_push(ctx->output, v->data[i]);
 }
 
-static void add(Token *t) { vec_push(ctx->output, t); }
+static void add(Token *t) {
+  vec_push(ctx->output, t);
+}
 
-static Token *next()
-{
+static Token *next() {
   assert(ctx->pos < ctx->input->len);
   return ctx->input->data[ctx->pos++];
 }
 
-static bool eof() { return ctx->pos == ctx->input->len; }
+static bool eof() {
+  return ctx->pos == ctx->input->len;
+}
 
-static Token *get(int ty, char *msg)
-{
+static Token *get(int ty, char *msg) {
   Token *t = next();
   if (t->ty != ty)
     bad_token(t, msg);
   return t;
 }
 
-static char *ident(char *msg)
-{
+static char *ident(char *msg) {
   Token *t = get(TK_IDENT, "parameter name expected");
   return t->name;
 }
 
-static Token *peek() { return ctx->input->data[ctx->pos]; }
+static Token *peek() {
+  return ctx->input->data[ctx->pos];
+}
 
-static bool consume(int ty)
-{
+static bool consume(int ty) {
   if (peek()->ty != ty)
     return false;
   ctx->pos++;
   return true;
 }
 
-static Vector *read_until_eol()
-{
+static Vector *read_until_eol() {
   Vector *v = new_vec();
-  while (!eof())
-  {
+  while (!eof()) {
     Token *t = next();
     if (t->ty == '\n')
       break;
@@ -99,8 +93,7 @@ static Vector *read_until_eol()
   return v;
 }
 
-static Token *new_int(Token *tmpl, int val)
-{
+static Token *new_int(Token *tmpl, int val) {
   Token *t = calloc(1, sizeof(Token));
   *t = *tmpl;
   t->ty = TK_NUM;
@@ -108,8 +101,7 @@ static Token *new_int(Token *tmpl, int val)
   return t;
 }
 
-static Token *new_string(Token *tmpl, char *str, int len)
-{
+static Token *new_string(Token *tmpl, char *str, int len) {
   Token *t = calloc(1, sizeof(Token));
   *t = *tmpl;
   t->ty = TK_STR;
@@ -118,8 +110,7 @@ static Token *new_string(Token *tmpl, char *str, int len)
   return t;
 }
 
-static Token *new_param(Token *tmpl, int val)
-{
+static Token *new_param(Token *tmpl, int val) {
   Token *t = calloc(1, sizeof(Token));
   *t = *tmpl;
   t->ty = TK_PARAM;
@@ -127,27 +118,23 @@ static Token *new_param(Token *tmpl, int val)
   return t;
 }
 
-static bool is_ident(Token *t, char *s)
-{
+static bool is_ident(Token *t, char *s) {
   return t->ty == TK_IDENT && !strcmp(t->name, s);
 }
 
 // Replaces macro parameter tokens with TK_PARAM token.
-static void replace_macro_params(Macro *m)
-{
+static void replace_macro_params(Macro *m) {
   Vector *params = m->params;
   Vector *tokens = m->tokens;
 
   // Replaces macro parameter tokens with TK_PARAM tokens.
   Map *map = new_map();
-  for (int i = 0; i < params->len; i++)
-  {
+  for (int i = 0; i < params->len; i++) {
     char *name = params->data[i];
     map_puti(map, name, i);
   }
 
-  for (int i = 0; i < tokens->len; i++)
-  {
+  for (int i = 0; i < tokens->len; i++) {
     Token *t = tokens->data[i];
     if (t->ty != TK_IDENT)
       continue;
@@ -159,25 +146,20 @@ static void replace_macro_params(Macro *m)
 }
 
 // Process '#' followed by a macro parameter with one token.
-static void replace_hash_ident(Macro *m)
-{
+static void replace_hash_ident(Macro *m) {
   Vector *tokens = m->tokens;
   Vector *v = new_vec();
 
   int i = 0;
-  for (; i < tokens->len - 1; i++)
-  {
+  for (; i < tokens->len - 1; i++) {
     Token *t1 = tokens->data[i];
     Token *t2 = tokens->data[i + 1];
 
-    if (t1->ty == '#' && t2->ty == TK_PARAM)
-    {
+    if (t1->ty == '#' && t2->ty == TK_PARAM) {
       t2->stringize = true;
       vec_push(v, t2);
       i++;
-    }
-    else
-    {
+    } else {
       vec_push(v, t1);
     }
   }
@@ -187,14 +169,12 @@ static void replace_hash_ident(Macro *m)
   m->tokens = v;
 }
 
-static Vector *read_one_arg()
-{
+static Vector *read_one_arg() {
   Vector *v = new_vec();
   Token *start = peek();
   int level = 0;
 
-  while (!eof())
-  {
+  while (!eof()) {
     Token *t = peek();
     if (level == 0)
       if (t->ty == ')' || t->ty == ',')
@@ -210,26 +190,22 @@ static Vector *read_one_arg()
   bad_token(start, "unclosed macro argument");
 }
 
-static Vector *read_args()
-{
+static Vector *read_args() {
   Vector *v = new_vec();
   if (consume(')'))
     return v;
   vec_push(v, read_one_arg());
-  while (!consume(')'))
-  {
+  while (!consume(')')) {
     get(',', "comma expected");
     vec_push(v, read_one_arg());
   }
   return v;
 }
 
-static Token *stringize(Token *tmpl, Vector *tokens)
-{
+static Token *stringize(Token *tmpl, Vector *tokens) {
   StringBuilder *sb = new_sb();
 
-  for (int i = 0; i < tokens->len; i++)
-  {
+  for (int i = 0; i < tokens->len; i++) {
     Token *t = tokens->data[i];
     if (i)
       sb_add(sb, ' ');
@@ -240,20 +216,16 @@ static Token *stringize(Token *tmpl, Vector *tokens)
   return new_string(tmpl, s, sb->len);
 }
 
-static bool add_special_macro(Token *t)
-{
-  if (is_ident(t, "__LINE__"))
-  {
+static bool add_special_macro(Token *t) {
+  if (is_ident(t, "__LINE__")) {
     add(new_int(t, get_line_number(t)));
     return true;
   }
   return false;
 }
 
-static void apply_objlike(Macro *m, Token *start)
-{
-  for (int i = 0; i < m->tokens->len; i++)
-  {
+static void apply_objlike(Macro *m, Token *start) {
+  for (int i = 0; i < m->tokens->len; i++) {
     Token *t = m->tokens->data[i];
     if (add_special_macro(t))
       continue;
@@ -261,22 +233,19 @@ static void apply_objlike(Macro *m, Token *start)
   }
 }
 
-static void apply_funclike(Macro *m, Token *start)
-{
+static void apply_funclike(Macro *m, Token *start) {
   get('(', "comma expected");
 
   Vector *args = read_args();
   if (m->params->len != args->len)
     bad_token(start, "number of parameter does not match");
 
-  for (int i = 0; i < m->tokens->len; i++)
-  {
+  for (int i = 0; i < m->tokens->len; i++) {
     Token *t = m->tokens->data[i];
     if (add_special_macro(t))
       continue;
 
-    if (t->ty == TK_PARAM)
-    {
+    if (t->ty == TK_PARAM) {
       if (t->stringize)
         add(stringize(t, args->data[t->val]));
       else
@@ -287,20 +256,17 @@ static void apply_funclike(Macro *m, Token *start)
   }
 }
 
-static void apply(Macro *m, Token *start)
-{
+static void apply(Macro *m, Token *start) {
   if (m->ty == OBJLIKE)
     apply_objlike(m, start);
   else
     apply_funclike(m, start);
 }
 
-static void define_funclike(char *name)
-{
+static void define_funclike(char *name) {
   Macro *m = new_macro(FUNCLIKE, name);
   vec_push(m->params, ident("parameter name expected"));
-  while (!consume(')'))
-  {
+  while (!consume(')')) {
     get(',', "comma expected");
     vec_push(m->params, ident("parameter name expected"));
   }
@@ -309,40 +275,34 @@ static void define_funclike(char *name)
   replace_hash_ident(m);
 }
 
-static void define_objlike(char *name)
-{
+static void define_objlike(char *name) {
   Macro *m = new_macro(OBJLIKE, name);
   m->tokens = read_until_eol();
 }
 
-static void define()
-{
+static void define() {
   char *name = ident("macro name expected");
   if (consume('('))
     return define_funclike(name);
   return define_objlike(name);
 }
 
-static void include()
-{
+static void include() {
   Token *t = get(TK_STR, "string expected");
   char *path = t->str;
   get('\n', "newline expected");
   append(tokenize(path, false));
 }
 
-Vector *preprocess(Vector *tokens)
-{
+Vector *preprocess(Vector *tokens) {
   if (!macros)
     macros = new_map();
   ctx = new_ctx(ctx, tokens);
 
-  while (!eof())
-  {
+  while (!eof()) {
     Token *t = next();
 
-    if (t->ty == TK_IDENT)
-    {
+    if (t->ty == TK_IDENT) {
       Macro *m = map_get(macros, t->name);
       if (m)
         apply(m, t);
@@ -351,8 +311,7 @@ Vector *preprocess(Vector *tokens)
       continue;
     }
 
-    if (t->ty != '#')
-    {
+    if (t->ty != '#') {
       add(t);
       continue;
     }

@@ -19,8 +19,7 @@ static int return_label;
 static int return_reg;
 static int break_label;
 
-static IR *add(int op, int lhs, int rhs)
-{
+static IR *add(int op, int lhs, int rhs) {
   IR *ir = calloc(1, sizeof(IR));
   ir->op = op;
   ir->lhs = lhs;
@@ -29,33 +28,35 @@ static IR *add(int op, int lhs, int rhs)
   return ir;
 }
 
-static IR *add_imm(int op, int lhs, int rhs)
-{
+static IR *add_imm(int op, int lhs, int rhs) {
   IR *ir = add(op, lhs, rhs);
   ir->is_imm = true;
   return ir;
 }
 
-static void kill(int r) { add(IR_KILL, r, -1); }
-static void label(int x) { add(IR_LABEL, x, -1); }
-static void jmp(int x) { add(IR_JMP, x, -1); }
+static void kill(int r) {
+  add(IR_KILL, r, -1);
+}
+static void label(int x) {
+  add(IR_LABEL, x, -1);
+}
+static void jmp(int x) {
+  add(IR_JMP, x, -1);
+}
 
 static int gen_expr(Node *node);
 
-static void load(Node *node, int dst, int src)
-{
+static void load(Node *node, int dst, int src) {
   IR *ir = add(IR_LOAD, dst, src);
   ir->size = node->ty->size;
 }
 
-static void store(Node *node, int dst, int src)
-{
+static void store(Node *node, int dst, int src) {
   IR *ir = add(IR_STORE, dst, src);
   ir->size = node->ty->size;
 }
 
-static void store_arg(Node *node, int bpoff, int argreg)
-{
+static void store_arg(Node *node, int bpoff, int argreg) {
   IR *ir = add(IR_STORE_ARG, bpoff, argreg);
   ir->size = node->ty->size;
 }
@@ -77,20 +78,17 @@ static void store_arg(Node *node, int bpoff, int argreg)
 // conversion.
 //
 // This function evaluates a given node as an lvalue.
-static int gen_lval(Node *node)
-{
+static int gen_lval(Node *node) {
   if (node->op == ND_DEREF)
     return gen_expr(node->expr);
 
-  if (node->op == ND_DOT)
-  {
+  if (node->op == ND_DOT) {
     int r = gen_lval(node->expr);
     add_imm(IR_ADD, r, node->offset);
     return r;
   }
 
-  if (node->op == ND_LVAR)
-  {
+  if (node->op == ND_LVAR) {
     int r = nreg++;
     add(IR_BPREL, r, node->offset);
     return r;
@@ -103,8 +101,7 @@ static int gen_lval(Node *node)
   return r;
 }
 
-static int gen_binop(int ty, Node *node)
-{
+static int gen_binop(int ty, Node *node) {
   int lhs = gen_expr(node->lhs);
   int rhs = gen_expr(node->rhs);
   add(ty, lhs, rhs);
@@ -112,15 +109,13 @@ static int gen_binop(int ty, Node *node)
   return lhs;
 }
 
-int get_inc_scale(Node *node)
-{
+int get_inc_scale(Node *node) {
   if (node->ty->ty == PTR)
     return node->ty->ptr_to->size;
   return 1;
 }
 
-static int gen_pre_inc(Node *node, int num)
-{
+static int gen_pre_inc(Node *node, int num) {
   int addr = gen_lval(node->expr);
   int val = nreg++;
   load(node, val, addr);
@@ -130,17 +125,14 @@ static int gen_pre_inc(Node *node, int num)
   return val;
 }
 
-static int gen_post_inc(Node *node, int num)
-{
+static int gen_post_inc(Node *node, int num) {
   int val = gen_pre_inc(node, num);
   add_imm(IR_SUB, val, num * get_inc_scale(node));
   return val;
 }
 
-static int to_assign_op(int op)
-{
-  switch (op)
-  {
+static int to_assign_op(int op) {
+  switch (op) {
   case ND_MUL_EQ:
     return IR_MUL;
   case ND_DIV_EQ:
@@ -165,8 +157,7 @@ static int to_assign_op(int op)
   }
 }
 
-static int gen_assign_op(Node *node)
-{
+static int gen_assign_op(Node *node) {
   int src = gen_expr(node->rhs);
   int dst = gen_lval(node->lhs);
   int val = nreg++;
@@ -181,12 +172,9 @@ static int gen_assign_op(Node *node)
 
 static void gen_stmt(Node *node);
 
-static int gen_expr(Node *node)
-{
-  switch (node->op)
-  {
-  case ND_NUM:
-  {
+static int gen_expr(Node *node) {
+  switch (node->op) {
+  case ND_NUM: {
     int r = nreg++;
     add(IR_IMM, r, node->val);
     return r;
@@ -195,8 +183,7 @@ static int gen_expr(Node *node)
     return gen_binop(IR_EQ, node);
   case ND_NE:
     return gen_binop(IR_NE, node);
-  case ND_LOGAND:
-  {
+  case ND_LOGAND: {
     int x = nlabel++;
 
     int r1 = gen_expr(node->lhs);
@@ -209,8 +196,7 @@ static int gen_expr(Node *node)
     label(x);
     return r1;
   }
-  case ND_LOGOR:
-  {
+  case ND_LOGOR: {
     int x = nlabel++;
     int y = nlabel++;
 
@@ -230,14 +216,12 @@ static int gen_expr(Node *node)
   }
   case ND_GVAR:
   case ND_LVAR:
-  case ND_DOT:
-  {
+  case ND_DOT: {
     int r = gen_lval(node);
     load(node, r, r);
     return r;
   }
-  case ND_CALL:
-  {
+  case ND_CALL: {
     int args[6];
     for (int i = 0; i < node->args->len; i++)
       args[i] = gen_expr(node->args->data[i]);
@@ -255,14 +239,12 @@ static int gen_expr(Node *node)
   }
   case ND_ADDR:
     return gen_lval(node->expr);
-  case ND_DEREF:
-  {
+  case ND_DEREF: {
     int r = gen_expr(node->expr);
     load(node, r, r);
     return r;
   }
-  case ND_STMT_EXPR:
-  {
+  case ND_STMT_EXPR: {
     int orig_label = return_label;
     int orig_reg = return_reg;
     return_label = nlabel++;
@@ -287,8 +269,7 @@ static int gen_expr(Node *node)
   case ND_XOR_EQ:
   case ND_BITOR_EQ:
     return gen_assign_op(node);
-  case '=':
-  {
+  case '=': {
     int rhs = gen_expr(node->rhs);
     int lhs = gen_lval(node->lhs);
     store(node, lhs, rhs);
@@ -319,14 +300,12 @@ static int gen_expr(Node *node)
     return gen_binop(IR_SHL, node);
   case ND_SHR:
     return gen_binop(IR_SHR, node);
-  case '~':
-  {
+  case '~': {
     int r = gen_expr(node->expr);
     add_imm(IR_XOR, r, -1);
     return r;
   }
-  case ND_NEG:
-  {
+  case ND_NEG: {
     int r = gen_expr(node->expr);
     add(IR_NEG, r, -1);
     return r;
@@ -338,8 +317,7 @@ static int gen_expr(Node *node)
   case ',':
     kill(gen_expr(node->lhs));
     return gen_expr(node->rhs);
-  case '?':
-  {
+  case '?': {
     int x = nlabel++;
     int y = nlabel++;
     int r = gen_expr(node->cond);
@@ -357,8 +335,7 @@ static int gen_expr(Node *node)
     label(y);
     return r;
   }
-  case '!':
-  {
+  case '!': {
     int lhs = gen_expr(node->expr);
     int rhs = nreg++;
     add(IR_IMM, rhs, 0);
@@ -371,14 +348,11 @@ static int gen_expr(Node *node)
   }
 }
 
-static void gen_stmt(Node *node)
-{
-  switch (node->op)
-  {
+static void gen_stmt(Node *node) {
+  switch (node->op) {
   case ND_NULL:
     return;
-  case ND_VARDEF:
-  {
+  case ND_VARDEF: {
     if (!node->init)
       return;
     int rhs = gen_expr(node->init);
@@ -389,10 +363,8 @@ static void gen_stmt(Node *node)
     kill(rhs);
     return;
   }
-  case ND_IF:
-  {
-    if (node->els)
-    {
+  case ND_IF: {
+    if (node->els) {
       int x = nlabel++;
       int y = nlabel++;
       int r = gen_expr(node->cond);
@@ -414,8 +386,7 @@ static void gen_stmt(Node *node)
     label(x);
     return;
   }
-  case ND_FOR:
-  {
+  case ND_FOR: {
     int x = nlabel++;
     int y = nlabel++;
     int orig = break_label;
@@ -423,8 +394,7 @@ static void gen_stmt(Node *node)
 
     gen_stmt(node->init);
     label(x);
-    if (node->cond)
-    {
+    if (node->cond) {
       int r = gen_expr(node->cond);
       add(IR_UNLESS, r, y);
       kill(r);
@@ -438,8 +408,7 @@ static void gen_stmt(Node *node)
     break_label = orig;
     return;
   }
-  case ND_DO_WHILE:
-  {
+  case ND_DO_WHILE: {
     int x = nlabel++;
     int orig = break_label;
     break_label = nlabel++;
@@ -457,13 +426,11 @@ static void gen_stmt(Node *node)
       error("stray 'break' statement");
     jmp(break_label);
     break;
-  case ND_RETURN:
-  {
+  case ND_RETURN: {
     int r = gen_expr(node->expr);
 
     // Statement expression (GNU extension)
-    if (return_label)
-    {
+    if (return_label) {
       add(IR_MOV, return_reg, r);
       kill(r);
       jmp(return_label);
@@ -486,12 +453,10 @@ static void gen_stmt(Node *node)
   }
 }
 
-Vector *gen_ir(Vector *nodes)
-{
+Vector *gen_ir(Vector *nodes) {
   Vector *v = new_vec();
 
-  for (int i = 0; i < nodes->len; i++)
-  {
+  for (int i = 0; i < nodes->len; i++) {
     Node *node = nodes->data[i];
 
     if (node->op == ND_VARDEF || node->op == ND_DECL)
@@ -500,8 +465,7 @@ Vector *gen_ir(Vector *nodes)
     assert(node->op == ND_FUNC);
     code = new_vec();
 
-    for (int i = 0; i < node->args->len; i++)
-    {
+    for (int i = 0; i < node->args->len; i++) {
       Node *arg = node->args->data[i];
       store_arg(arg, arg->offset, i);
     }

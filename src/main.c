@@ -1,14 +1,14 @@
 #include "zcc.h"
 
-void usage() { error("Usage: zcc [-test] [-dump-ir1] [-dump-ir2] <file>"); }
+void usage() {
+  error("Usage: zcc [-test] [-dump-ir1] [-dump-ir2] <file>");
+}
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   if (argc == 1)
     usage();
 
-  if (argc == 2 && !strcmp(argv[1], "-test"))
-  {
+  if (argc == 2 && !strcmp(argv[1], "-test")) {
     util_test();
     return 0;
   }
@@ -17,18 +17,13 @@ int main(int argc, char **argv)
   bool dump_ir1 = false;
   bool dump_ir2 = false;
 
-  if (argc == 3 && !strcmp(argv[1], "-dump-ir1"))
-  {
+  if (argc == 3 && !strcmp(argv[1], "-dump-ir1")) {
     dump_ir1 = true;
     path = argv[2];
-  }
-  else if (argc == 3 && !strcmp(argv[1], "-dump-ir2"))
-  {
+  } else if (argc == 3 && !strcmp(argv[1], "-dump-ir2")) {
     dump_ir2 = true;
     path = argv[2];
-  }
-  else
-  {
+  } else {
     if (argc != 2)
       usage();
     path = argv[1];
