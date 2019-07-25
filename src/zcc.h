@@ -14,8 +14,7 @@
 noreturn void error(char *fmt, ...);
 char *format(char *fmt, ...);
 
-typedef struct
-{
+typedef struct {
   void **data;
   int capacity;
   int len;
@@ -24,8 +23,7 @@ typedef struct
 Vector *new_vec(void);
 void vec_push(Vector *v, void *elem);
 
-typedef struct
-{
+typedef struct {
   Vector *keys;
   Vector *vals;
 } Map;
@@ -37,8 +35,7 @@ void *map_get(Map *map, char *key);
 int map_geti(Map *map, char *key, int default_);
 bool map_exists(Map *map, char *key);
 
-typedef struct
-{
+typedef struct {
   char *data;
   int capacity;
   int len;
@@ -50,8 +47,7 @@ void sb_append(StringBuilder *sb, char *s);
 void sb_append_n(StringBuilder *sb, char *s, int len);
 char *sb_get(StringBuilder *sb);
 
-typedef struct Type
-{
+typedef struct Type {
   int ty;
   int size;  // sizeof
   int align; // alignof
@@ -73,6 +69,7 @@ typedef struct Type
 
 Type *ptr_to(Type *base);
 Type *ary_of(Type *base, int len);
+bool same_type(Type *x, Type *y);
 int roundup(int x, int align);
 
 /// util_test.c
@@ -81,8 +78,7 @@ void util_test();
 
 /// token.c
 
-enum
-{
+enum {
   TK_NUM = 256, // Number literal
   TK_STR,       // String literal
   TK_IDENT,     // Identifier
@@ -127,8 +123,7 @@ enum
 };
 
 // Token type
-typedef struct
-{
+typedef struct {
   int ty;     // Token type
   int val;    // Number literal
   char *name; // Identifier
@@ -159,8 +154,7 @@ Vector *preprocess(Vector *tokens);
 
 /// parse.c
 
-enum
-{
+enum {
   ND_NUM = 256, // Number literal
   ND_STR,       // String literal
   ND_IDENT,     // Identifier
@@ -208,8 +202,7 @@ enum
   ND_NULL,      // Null statement
 };
 
-enum
-{
+enum {
   INT,
   CHAR,
   VOID,
@@ -219,8 +212,7 @@ enum
   FUNC,
 };
 
-typedef struct Node
-{
+typedef struct Node {
   int op;            // Node type
   Type *ty;          // C type
   struct Node *lhs;  // left-hand side
@@ -265,8 +257,7 @@ Node *new_int_node(int val, Token *t);
 
 /// sema.c
 
-typedef struct
-{
+typedef struct {
   Type *ty;
   bool is_local;
 
@@ -284,8 +275,7 @@ Vector *sema(Vector *nodes);
 
 /// ir_dump.c
 
-typedef struct
-{
+typedef struct {
   char *name;
   int ty;
 } IRInfo;
@@ -296,8 +286,7 @@ void dump_ir(Vector *irv);
 
 /// gen_ir.c
 
-enum
-{
+enum {
   IR_ADD,
   IR_SUB,
   IR_MUL,
@@ -330,8 +319,7 @@ enum
   IR_NOP,
 };
 
-typedef struct
-{
+typedef struct {
   int op;
   int lhs;
   int rhs;
@@ -348,8 +336,7 @@ typedef struct
   int args[6];
 } IR;
 
-enum
-{
+enum {
   IR_TY_NOARG,
   IR_TY_BINARY,
   IR_TY_REG,
@@ -365,8 +352,7 @@ enum
   IR_TY_CALL,
 };
 
-typedef struct
-{
+typedef struct {
   char *name;
   int stacksize;
   Vector *ir;
