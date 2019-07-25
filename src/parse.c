@@ -188,10 +188,16 @@ static Type *decl_specifiers()
   bad_token(t, "typename expected");
 }
 
-static Node *new_binop(int op, Node *lhs, Node *rhs)
+static Node *new_node(int op)
 {
   Node *node = calloc(1, sizeof(Node));
   node->op = op;
+  return node;
+}
+
+static Node *new_binop(int op, Node *lhs, Node *rhs)
+{
+  Node *node = new_node(op);
   node->lhs = lhs;
   node->rhs = rhs;
   return node;
@@ -199,16 +205,14 @@ static Node *new_binop(int op, Node *lhs, Node *rhs)
 
 static Node *new_expr(int op, Node *expr)
 {
-  Node *node = calloc(1, sizeof(Node));
-  node->op = op;
+  Node *node = new_node(op);
   node->expr = expr;
   return node;
 }
 
-static Node *new_num(int val)
+Node *new_int_node(int val)
 {
-  Node *node = calloc(1, sizeof(Node));
-  node->op = ND_NUM;
+  Node *node = new_node(ND_NUM);
   node->ty = int_ty();
   node->val = val;
   return node;
@@ -232,8 +236,7 @@ static Node *primary()
   {
     if (consume('{'))
     {
-      Node *node = calloc(1, sizeof(Node));
-      node->op = ND_STMT_EXPR;
+      Node *node = new_node(ND_STMT_EXPR);
       node->body = compound_stmt();
       expect(')');
       return node;
@@ -243,15 +246,13 @@ static Node *primary()
     return node;
   }
 
-  Node *node = calloc(1, sizeof(Node));
-
   if (t->ty == TK_NUM)
-    return new_num(t->val);
+    return new_int_node(t->val);
 
   if (t->ty == TK_STR)
   {
+    Node *node = new_node(ND_STR);
     node->ty = ary_of(char_ty(), t->len);
-    node->op = ND_STR;
     node->data = t->str;
     node->len = t->len;
     return node;
@@ -259,15 +260,15 @@ static Node *primary()
 
   if (t->ty == TK_IDENT)
   {
-    node->name = t->name;
-
     if (!consume('('))
     {
-      node->op = ND_IDENT;
+      Node *node = new_node(ND_IDENT);
+      node->name = t->name;
       return node;
     }
 
-    node->op = ND_CALL;
+    Node *node = new_node(ND_CALL);
+    node->name = t->name;
     node->args = new_vec();
     if (consume(')'))
       return node;
@@ -344,9 +345,9 @@ static Node *unary()
     return new_expr(ND_ALIGNOF, unary());
 
   if (consume(TK_INC))
-    return new_binop(ND_ADD_EQ, unary(), new_num(1));
+    return new_binop(ND_ADD_EQ, unary(), new_int_node(1));
   if (consume(TK_DEC))
-    return new_binop(ND_SUB_EQ, unary(), new_num(1));
+    return new_binop(ND_SUB_EQ, unary(), new_int_node(1));
 
   return postfix();
 }
@@ -473,8 +474,7 @@ static Node *conditional()
   if (!consume('?'))
     return cond;
 
-  Node *node = calloc(1, sizeof(Node));
-  node->op = '?';
+  Node *node = new_node('?');
   node->cond = cond;
   node->then = expr();
   expect(':');
@@ -564,8 +564,7 @@ static Node *direct_decl(Type *ty)
 
   if (t->ty == TK_IDENT)
   {
-    node = calloc(1, sizeof(Node));
-    node->op = ND_VARDEF;
+    node = new_node(ND_VARDEF);
     node->ty = placeholder;
     node->name = ident();
   }
@@ -621,7 +620,6 @@ static Node *expr_stmt()
 
 static Node *stmt()
 {
-  Node *node = calloc(1, sizeof(Node));
   Token *t = tokens->data[pos++];
 
   switch (t->ty)
@@ -634,7 +632,8 @@ static Node *stmt()
     return &null_stmt;
   }
   case TK_IF:
-    node->op = ND_IF;
+  {
+    Node *node = new_node(ND_IF);
     expect('(');
     node->cond = expr();
     expect(')');
@@ -644,8 +643,10 @@ static Node *stmt()
     if (consume(TK_ELSE))
       node->els = stmt();
     return node;
+  }
   case TK_FOR:
-    node->op = ND_FOR;
+  {
+    Node *node = new_node(ND_FOR);
     expect('(');
 
     if (is_typename())
@@ -669,8 +670,10 @@ static Node *stmt()
 
     node->body = stmt();
     return node;
+  }
   case TK_WHILE:
-    node->op = ND_FOR;
+  {
+    Node *node = new_node(ND_FOR);
     node->init = &null_stmt;
     node->inc = &null_stmt;
     expect('(');
@@ -678,8 +681,10 @@ static Node *stmt()
     expect(')');
     node->body = stmt();
     return node;
+  }
   case TK_DO:
-    node->op = ND_DO_WHILE;
+  {
+    Node *node = new_node(ND_DO_WHILE);
     node->body = stmt();
     expect(TK_WHILE);
     expect('(');
@@ -687,19 +692,24 @@ static Node *stmt()
     expect(')');
     expect(';');
     return node;
+  }
   case TK_BREAK:
     return &break_stmt;
   case TK_RETURN:
-    node->op = ND_RETURN;
+  {
+    Node *node = new_node(ND_RETURN);
     node->expr = expr();
     expect(';');
     return node;
+  }
   case '{':
-    node->op = ND_COMP_STMT;
+  {
+    Node *node = new_node(ND_COMP_STMT);
     node->stmts = new_vec();
     while (!consume('}'))
       vec_push(node->stmts, stmt());
     return node;
+  }
   case ';':
     return &null_stmt;
   default:
@@ -712,8 +722,7 @@ static Node *stmt()
 
 static Node *compound_stmt()
 {
-  Node *node = calloc(1, sizeof(Node));
-  node->op = ND_COMP_STMT;
+  Node *node = new_node(ND_COMP_STMT);
   node->stmts = new_vec();
 
   env = new_env(env);
@@ -737,13 +746,13 @@ static Node *toplevel()
   // Function
   if (consume('('))
   {
-    Node *node = calloc(1, sizeof(Node));
+    Node *node = new_node(ND_DECL);
     node->name = name;
     node->args = new_vec();
 
     node->ty = calloc(1, sizeof(Type));
-    node->op = ND_FUNC;
-    node->ty = ty;
+    node->ty->ty = FUNC;
+    node->ty->returning = ty;
 
     if (!consume(')'))
     {
@@ -754,10 +763,7 @@ static Node *toplevel()
     }
 
     if (consume(';'))
-    {
-      node->op = ND_DECL;
       return node;
-    }
 
     node->op = ND_FUNC;
     Token *t = tokens->data[pos];
@@ -778,8 +784,7 @@ static Node *toplevel()
   }
 
   // Global variable
-  Node *node = calloc(1, sizeof(Node));
-  node->op = ND_VARDEF;
+  Node *node = new_node(ND_VARDEF);
   node->ty = ty;
   node->name = name;
   node->is_extern = is_extern;

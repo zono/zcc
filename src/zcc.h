@@ -257,6 +257,8 @@ typedef struct Node
 
 Vector *parse(Vector *tokens);
 
+Node *new_int_node(int val);
+
 /// sema.c
 
 typedef struct
