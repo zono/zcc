@@ -389,7 +389,6 @@ static void gen_stmt(Node *node) {
   }
   case ND_FOR: {
     int x = nlabel++;
-
     gen_stmt(node->init);
     label(x);
     if (node->cond) {
@@ -413,6 +412,7 @@ static void gen_stmt(Node *node) {
     int r = gen_expr(node->cond);
     add(IR_IF, r, x);
     kill(r);
+    label(node->break_label);
     return;
   }
   case ND_BREAK:

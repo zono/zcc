@@ -285,7 +285,7 @@ Node *new_int_node(int val, Token *t);
 /// sema.c
 
 Type *get_type(Node *node);
-void sema(Program *prog_);
+void sema(Program *prog);
 
 /// ir_dump.c
 
