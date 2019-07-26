@@ -22,4 +22,7 @@ test: zcc test/test.c
 clean:
 	rm -f zcc *.o *~ tmp* a.out test/*~
 
+format:
+	clang-format -i *.c *.h
+
 .PHONY: test clean

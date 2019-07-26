@@ -1,15 +1,13 @@
 #include "zcc.h"
 
-static void expect(int line, int expected, int actual)
-{
+static void expect(int line, int expected, int actual) {
   if (expected == actual)
     return;
   fprintf(stderr, "%d: %d expected, but got %d\n", line, expected, actual);
   exit(1);
 }
 
-static void vec_test()
-{
+static void vec_test() {
   Vector *vec = new_vec();
   expect(__LINE__, 0, vec->len);
 
@@ -22,8 +20,7 @@ static void vec_test()
   expect(__LINE__, 99, (intptr_t)vec->data[99]);
 }
 
-static void map_test()
-{
+static void map_test() {
   Map *map = new_map();
   expect(__LINE__, 0, (intptr_t)map_get(map, "foo"));
 
@@ -37,8 +34,7 @@ static void map_test()
   expect(__LINE__, 6, (intptr_t)map_get(map, "foo"));
 }
 
-static void sb_test()
-{
+static void sb_test() {
   StringBuilder *sb1 = new_sb();
   expect(__LINE__, 0, strlen(sb_get(sb1)));
 
@@ -59,8 +55,7 @@ static void sb_test()
   expect(__LINE__, 1, !strcmp(sb_get(sb4), "foobarfoobar"));
 }
 
-void util_test()
-{
+void util_test() {
   vec_test();
   map_test();
   sb_test();
