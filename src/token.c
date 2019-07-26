@@ -81,16 +81,16 @@ static void print_line(char *buf, char *path, char *pos) {
   }
 }
 
-noreturn void bad_token(Token *t, char *msg) {
-  warn_token(t, msg);
-  exit(1);
-}
-
 void warn_token(Token *t, char *msg) {
   if (t->start)
     print_line(t->buf, t->path, t->start);
   fprintf(stderr, msg);
   fprintf(stderr, "\n");
+}
+
+noreturn void bad_token(Token *t, char *msg) {
+  warn_token(t, msg);
+  exit(1);
 }
 
 noreturn static void bad_position(char *p, char *msg) {
@@ -140,11 +140,6 @@ static struct {
     {NULL, 0},
 };
 
-static char escaped[256] = {
-    ['a'] = '\a', ['b'] = '\b', ['f'] = '\f',   ['n'] = '\n',   ['r'] = '\r',
-    ['t'] = '\t', ['v'] = '\v', ['e'] = '\033', ['E'] = '\033',
-};
-
 static Map *keyword_map() {
   Map *map = new_map();
   map_puti(map, "_Alignof", TK_ALIGNOF);
@@ -167,43 +162,79 @@ static Map *keyword_map() {
   return map;
 }
 
+// Returns true if s1 starts with s2.
+static bool startswith(char *s1, char *s2) {
+  return !strncmp(s1, s2, strlen(s2));
+}
+
 static char *block_comment(char *pos) {
   for (char *p = pos + 2; *p; p++)
-    if (!strncmp(p, "*/", 2))
+    if (startswith(p, "*/"))
       return p + 2;
   bad_position(pos, "unclosed comment");
 }
 
-static int c_char(int *res, char *p) {
+static int isoctal(char c) {
+  return '0' <= c && c <= '7';
+}
+
+static int hex(char c) {
+  if ('0' <= c && c <= '9')
+    return c - '0';
+  if ('a' <= c && c <= 'f')
+    return c - 'a' + 10;
+  assert('A' <= c && c <= 'F');
+  return c - 'A' + 10;
+}
+
+// Read a single character in a char or string literal.
+static char *c_char(int *res, char *p) {
+  // Nonescaped
   if (*p != '\\') {
     *res = *p;
-    return 1;
+    return p + 1;
   }
+  p++;
 
-  char *start = p++;
-  int esc = escaped[(unsigned)*p];
+  static char escaped[256] = {
+      ['a'] = '\a', ['b'] = '\b', ['f'] = '\f',   ['n'] = '\n',   ['r'] = '\r',
+      ['t'] = '\t', ['v'] = '\v', ['e'] = '\033', ['E'] = '\033',
+  };
+
+  // Simple (e.g. `\n` or `\a`)
+  int esc = escaped[(uint8_t)*p];
   if (esc) {
     *res = esc;
-    return 2;
+    return p + 1;
   }
 
-  if ('0' <= *p && *p <= '7') {
+  // Hexadecimal
+  if (*p == 'x') {
+    *res = 0;
+    p++;
+    while (isxdigit(*p))
+      *res = *res * 16 + hex(*p++);
+    return p;
+  }
+
+  // Octal
+  if (isoctal(*p)) {
     int i = *p++ - '0';
-    if ('0' <= *p && *p <= '7')
+    if (isoctal(*p))
       i = i * 8 + *p++ - '0';
-    if ('0' <= *p && *p <= '7')
+    if (isoctal(*p))
       i = i * 8 + *p++ - '0';
     *res = i;
-    return p - start;
+    return p;
   }
 
   *res = *p;
-  return 2;
+  return p + 1;
 }
 
 static char *char_literal(char *p) {
   Token *t = add(TK_NUM, p++);
-  p += c_char(&t->val, p);
+  p = c_char(&t->val, p);
   if (*p != '\'')
     bad_token(t, "unclosed character literal");
   t->end = p + 1;
@@ -216,28 +247,16 @@ static char *string_literal(char *p) {
 
   while (*p != '"') {
     if (!*p)
-      goto err;
-
-    if (*p != '\\') {
-      sb_add(sb, *p++);
-      continue;
-    }
-
-    p++;
-    if (*p == '\0')
-      goto err;
-    int esc = escaped[(unsigned)*p];
-    sb_add(sb, esc ? esc : *p);
-    p++;
+      bad_token(t, "unclosed string literal");
+    int c;
+    p = c_char(&c, p);
+    sb_add(sb, c);
   }
 
   t->str = sb_get(sb);
   t->len = sb->len;
   t->end = p + 1;
   return p + 1;
-
-err:
-  bad_token(t, "unclosed string literal");
 }
 
 static char *ident(char *p) {
@@ -260,23 +279,15 @@ static char *hexadecimal(char *p) {
   if (!isxdigit(*p))
     bad_token(t, "bad hexadecimal number");
 
-  for (;;) {
-    if ('0' <= *p && *p <= '9') {
-      t->val = t->val * 16 + *p++ - '0';
-    } else if ('a' <= *p && *p <= 'f') {
-      t->val = t->val * 16 + *p++ - 'a' + 10;
-    } else if ('A' <= *p && *p <= 'F') {
-      t->val = t->val * 16 + *p++ - 'A' + 10;
-    } else {
-      t->end = p;
-      return p;
-    }
-  }
+  while (isxdigit(*p))
+    t->val = t->val * 16 + hex(*p++);
+  t->end = p;
+  return p;
 }
 
 static char *octal(char *p) {
   Token *t = add(TK_NUM, p++);
-  while ('0' <= *p && *p <= '7')
+  while (isoctal(*p))
     t->val = t->val * 8 + *p++ - '0';
   t->end = p;
   return p;
@@ -291,7 +302,7 @@ static char *decimal(char *p) {
 }
 
 static char *number(char *p) {
-  if (!strncasecmp(p, "0x", 2))
+  if (startswith(p, "0x") || startswith(p, "0X"))
     return hexadecimal(p);
   if (*p == '0')
     return octal(p);
@@ -318,14 +329,14 @@ loop:
     }
 
     // Line comment
-    if (!strncmp(p, "//", 2)) {
+    if (startswith(p, "//")) {
       while (*p && *p != '\n')
         p++;
       continue;
     }
 
     // Block comment
-    if (!strncmp(p, "/*", 2)) {
+    if (startswith(p, "/*")) {
       p = block_comment(p);
       continue;
     }
@@ -345,12 +356,11 @@ loop:
     // Multi-letter symbol
     for (int i = 0; symbols[i].name; i++) {
       char *name = symbols[i].name;
-      int len = strlen(name);
-      if (strncmp(p, name, len))
+      if (!startswith(p, name))
         continue;
 
       Token *t = add(symbols[i].ty, p);
-      p += len;
+      p += strlen(name);
       t->end = p;
       goto loop;
     }
@@ -381,7 +391,7 @@ loop:
 
 static void replace_crlf(char *p) {
   for (char *q = p; *q;) {
-    if (q[0] == '\r' && q[1] == '\n')
+    if (startswith(q, "\r\n"))
       q++;
     *p++ = *q++;
   }
@@ -393,17 +403,19 @@ static void replace_crlf(char *p) {
 static void remove_backslash_newline(char *p) {
   int cnt = 0;
   for (char *q = p; *q;) {
-    if (q[0] == '\\' && q[1] == '\n') {
+    if (startswith(q, "\\\n")) {
       cnt++;
       q += 2;
-    } else if (*q == '\n') {
+      continue;
+    }
+    if (*q == '\n') {
       for (int i = 0; i < cnt + 1; i++)
         *p++ = '\n';
       q++;
       cnt = 0;
-    } else {
-      *p++ = *q++;
+      continue;
     }
+    *p++ = *q++;
   }
   *p = '\0';
 }
