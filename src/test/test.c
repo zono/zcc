@@ -203,6 +203,22 @@ int main() {
            } while (x < 10);
            return y;
          }));
+  EXPECT(1, ({
+           int x = 0;
+           do {
+             x++;
+             break;
+           } while (1);
+           return x;
+         }));
+  EXPECT(1, ({
+           int x = 0;
+           do {
+             x++;
+             continue;
+           } while (0);
+           return x;
+         }));
 
   EXPECT(60, ({
            int sum = 0;
@@ -229,7 +245,7 @@ int main() {
          }));
   EXPECT(5, ({
            int i = 0;
-           for (0; i < 10; i++)
+           for (; i < 10; i++)
              if (i == 5)
                break;
            return i;
@@ -240,6 +256,16 @@ int main() {
              i++;
              if (i == 10)
                break;
+           }
+           return i;
+         }));
+
+  EXPECT(7, ({
+           int i = 0;
+           for (int j = 0; j < 10; j++) {
+             if (j < 3)
+               continue;
+             i++;
            }
            return i;
          }));
@@ -266,6 +292,10 @@ int main() {
            x = 5;
            return *p;
          }));
+  EXPECT(4, ({
+           int *p;
+           return (p + 5) - (p + 1);
+         }));
 
   EXPECT(40, ({
            int ary[2][5];
@@ -277,7 +307,6 @@ int main() {
            ary[1][0] = 5;
            return add2(ary);
          }));
-
   EXPECT(8, ({
            int ary[2][2];
            ary[0][0] = 3;
@@ -562,10 +591,7 @@ int main() {
            i |= 3;
            return i;
          }));
-  EXPECT(4, ({
-           int *p;
-           return (p + 5) - (p + 1);
-         }));
+
   EXPECT(5, ({
            int x;
            typeof(x) y = 5;
