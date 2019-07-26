@@ -20,7 +20,6 @@ IRInfo irinfo[] = {
     [IR_SHR] = {"SHR", IR_TY_REG_REG},
     [IR_LOAD] = {"LOAD", IR_TY_MEM},
     [IR_MOD] = {"MOD", IR_TY_REG_REG},
-    [IR_NEG] = {"NEG", IR_TY_REG},
     [IR_MOV] = {"MOV", IR_TY_REG_REG},
     [IR_MUL] = {"MUL", IR_TY_BINARY},
     [IR_NOP] = {"NOP", IR_TY_NOARG},
@@ -33,12 +32,10 @@ IRInfo irinfo[] = {
     [IR_UNLESS] = {"UNLESS", IR_TY_REG_LABEL},
 };
 
-static char *tostr(IR *ir)
-{
+static char *tostr(IR *ir) {
   IRInfo info = irinfo[ir->op];
 
-  switch (info.ty)
-  {
+  switch (info.ty) {
   case IR_TY_BINARY:
     if (ir->is_imm)
       return format("  %s r%d, %d", info.name, ir->lhs, ir->rhs);
@@ -63,12 +60,10 @@ static char *tostr(IR *ir)
     return format("  %s%d %d, %d", info.name, ir->size, ir->lhs, ir->rhs);
   case IR_TY_REG_LABEL:
     return format("  %s r%d, .L%d", info.name, ir->lhs, ir->rhs);
-  case IR_TY_CALL:
-  {
+  case IR_TY_CALL: {
     StringBuilder *sb = new_sb();
     sb_append(sb, format("  r%d = %s(", ir->lhs, ir->name));
-    for (int i = 0; i < ir->nargs; i++)
-    {
+    for (int i = 0; i < ir->nargs; i++) {
       if (i != 0)
         sb_append(sb, ", ");
       sb_append(sb, format("r%d", ir->args[i]));
@@ -82,10 +77,8 @@ static char *tostr(IR *ir)
   }
 }
 
-void dump_ir(Vector *irv)
-{
-  for (int i = 0; i < irv->len; i++)
-  {
+void dump_ir(Vector *irv) {
+  for (int i = 0; i < irv->len; i++) {
     Function *fn = irv->data[i];
     fprintf(stderr, "%s():\n", fn->name);
     for (int j = 0; j < fn->ir->len; j++)
