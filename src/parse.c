@@ -7,10 +7,10 @@
 // when we see a variable definition and use it when we see a variable
 // reference.
 //
-// Type are added to variables and literals. For other nodes, Sema
+// Types are added to variables and literals. For other nodes, Sema
 // will add type for them.
 //
-// Semantic checking is omitted from this parser to make the code in 
+// Semantic checking is omitted from this parser to make the code in
 // this file closely resemble the C's BNF. Invalid expressions, such
 // as `1+2=3`, are accepted at this stage. Such errors are detected in
 // a later pass.
@@ -398,9 +398,9 @@ static Node *unary() {
   if (consume('~'))
     return new_expr('~', t, unary());
   if (consume(TK_SIZEOF))
-    return new_expr(ND_SIZEOF, t, unary());
+    return new_int_node(get_type(unary())->size, t);
   if (consume(TK_ALIGNOF))
-    return new_expr(ND_ALIGNOF, t, unary());
+    return new_int_node(get_type(unary())->align, t);
   if (consume(TK_INC))
     return new_binop(ND_ADD_EQ, t, unary(), new_int_node(1, t));
   if (consume(TK_DEC))
