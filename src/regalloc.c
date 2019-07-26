@@ -16,20 +16,17 @@ static bool *used;
 static int reg_map[8192];
 static int reg_map_sz = sizeof(reg_map) / sizeof(*reg_map);
 
-static int alloc(int ir_reg)
-{
+static int alloc(int ir_reg) {
   if (reg_map_sz <= ir_reg)
     error("program too big");
 
-  if (reg_map[ir_reg] != -1)
-  {
+  if (reg_map[ir_reg] != -1) {
     int r = reg_map[ir_reg];
     assert(used[r]);
     return r;
   }
 
-  for (int i = 0; i < num_regs; i++)
-  {
+  for (int i = 0; i < num_regs; i++) {
     if (used[i])
       continue;
     reg_map[ir_reg] = i;
@@ -39,14 +36,11 @@ static int alloc(int ir_reg)
   error("register exhausted");
 }
 
-static void visit(Vector *irv)
-{
-  for (int i = 0; i < irv->len; i++)
-  {
+static void visit(Vector *irv) {
+  for (int i = 0; i < irv->len; i++) {
     IR *ir = irv->data[i];
 
-    switch (irinfo[ir->op].ty)
-    {
+    switch (irinfo[ir->op].ty) {
     case IR_TY_BINARY:
       ir->lhs = alloc(ir->lhs);
       if (!ir->is_imm)
@@ -70,8 +64,7 @@ static void visit(Vector *irv)
       break;
     }
 
-    if (ir->op == IR_KILL)
-    {
+    if (ir->op == IR_KILL) {
       assert(used[ir->lhs]);
       used[ir->lhs] = false;
       ir->op = IR_NOP;
@@ -79,15 +72,13 @@ static void visit(Vector *irv)
   }
 }
 
-void alloc_regs(Vector *fns)
-{
+void alloc_regs(Program *prog) {
   used = calloc(1, num_regs);
   for (int i = 0; i < reg_map_sz; i++)
     reg_map[i] = -1;
 
-  for (int i = 0; i < fns->len; i++)
-  {
-    Function *fn = fns->data[i];
+  for (int i = 0; i < prog->funcs->len; i++) {
+    Function *fn = prog->funcs->data[i];
     visit(fn->ir);
   }
 }
