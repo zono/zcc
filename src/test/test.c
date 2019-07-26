@@ -72,35 +72,42 @@ int main() {
 
   EXPECT(2, ({
            int a = 2;
-           return a;
+           a;
          }));
+
   EXPECT(10, ({
            int a = 2;
            int b;
            b = 3 + 2;
-           return a * b;
+           a *b;
          }));
   EXPECT(2, ({
+           int i = 3;
            if (1)
-             return 2;
-           return 3;
+             i = 2;
+           i;
          }));
   EXPECT(3, ({
+           int i = 3;
            if (0)
-             return 2;
-           return 3;
+             i = 2;
+           i;
          }));
   EXPECT(2, ({
+           int i = 0;
            if (1)
-             return 2;
+             i = 2;
            else
-             return 3;
+             i = 3;
+           i;
          }));
   EXPECT(3, ({
+           int i = 0;
            if (0)
-             return 2;
+             i = 2;
            else
-             return 3;
+             i = 3;
+           i;
          }));
 
   EXPECT(5, plus(2, 3));
@@ -155,19 +162,19 @@ int main() {
 
   EXPECT(3, ({
            int i = 3;
-           return i++;
+           i++;
          }));
   EXPECT(4, ({
            int i = 3;
-           return ++i;
+           ++i;
          }));
   EXPECT(3, ({
            int i = 3;
-           return i--;
+           i--;
          }));
   EXPECT(2, ({
            int i = 3;
-           return --i;
+           --i;
          }));
 
   EXPECT(5, 0 ? 3 : 5);
@@ -185,13 +192,13 @@ int main() {
            int x;
            int y;
            x = y = 3;
-           return x;
+           x;
          }));
   EXPECT(3, ({
            int x;
            int y;
            x = y = 3;
-           return y;
+           y;
          }));
 
   EXPECT(45, ({
@@ -201,7 +208,7 @@ int main() {
              y = y + x;
              x = x + 1;
            } while (x < 10);
-           return y;
+           y;
          }));
   EXPECT(1, ({
            int x = 0;
@@ -209,7 +216,7 @@ int main() {
              x++;
              break;
            } while (1);
-           return x;
+           x;
          }));
   EXPECT(1, ({
            int x = 0;
@@ -217,7 +224,7 @@ int main() {
              x++;
              continue;
            } while (0);
-           return x;
+           x;
          }));
 
   EXPECT(60, ({
@@ -225,7 +232,7 @@ int main() {
            int i;
            for (i = 10; i < 15; i = i + 1)
              sum = sum + i;
-           return sum;
+           sum;
          }));
   EXPECT(89, ({
            int i = 1;
@@ -235,20 +242,20 @@ int main() {
              i = j;
              j = m;
            }
-           return i;
+           i;
          }));
   EXPECT(1, ({
            int i = 1;
            for (int i = 5; i < 10; i++)
              ;
-           return i;
+           i;
          }));
   EXPECT(5, ({
            int i = 0;
            for (; i < 10; i++)
              if (i == 5)
                break;
-           return i;
+           i;
          }));
   EXPECT(10, ({
            int i = 0;
@@ -257,7 +264,7 @@ int main() {
              if (i == 10)
                break;
            }
-           return i;
+           i;
          }));
 
   EXPECT(7, ({
@@ -267,7 +274,7 @@ int main() {
                continue;
              i++;
            }
-           return i;
+           i;
          }));
 
   EXPECT(45, ({
@@ -277,91 +284,91 @@ int main() {
              j = j + i;
              i = i + 1;
            }
-           return j;
+           j;
          }));
 
   EXPECT(3, ({
            int ary[2];
            *ary = 1;
            *(ary + 1) = 2;
-           return *ary + *(ary + 1);
+           *ary + *(ary + 1);
          }));
   EXPECT(5, ({
            int x;
            int *p = &x;
            x = 5;
-           return *p;
+           *p;
          }));
   EXPECT(4, ({
            int *p;
-           return (p + 5) - (p + 1);
+           (p + 5) - (p + 1);
          }));
 
   EXPECT(40, ({
            int ary[2][5];
-           return sizeof(ary);
+           sizeof(ary);
          }));
   EXPECT(8, ({
            int ary[2][2];
            ary[0][0] = 3;
            ary[1][0] = 5;
-           return add2(ary);
+           add2(ary);
          }));
   EXPECT(8, ({
            int ary[2][2];
            ary[0][0] = 3;
            ary[1][0] = 5;
-           return add3(ary);
+           add3(ary);
          }));
   EXPECT(8, ({
            int ary[2][2];
            ary[0][0] = 3;
            ary[1][0] = 5;
-           return add4(ary);
+           add4(ary);
          }));
 
   EXPECT(3, ({
            int ary[2];
            ary[0] = 1;
            ary[1] = 2;
-           return ary[0] + ary[0 + 1];
+           ary[0] + ary[0 + 1];
          }));
   EXPECT(5, ({
            int x;
            int *p = &x;
            x = 5;
-           return p[0];
+           p[0];
          }));
   EXPECT(1, ({
            int ary[2];
            ary[0] = 1;
            ary[1] = 2;
            int *p = ary;
-           return *p++;
+           *p++;
          }));
   EXPECT(2, ({
            int ary[2];
            ary[0] = 1;
            ary[1] = 2;
            int *p = ary;
-           return *++p;
+           *++p;
          }));
 
   EXPECT(1, ({
            char x;
-           return sizeof x;
+           sizeof x;
          }));
   EXPECT(4, ({
            int x;
-           return sizeof(x);
+           sizeof(x);
          }));
   EXPECT(8, ({
            int *x;
-           return sizeof x;
+           sizeof x;
          }));
   EXPECT(16, ({
            int x[4];
-           return sizeof x;
+           sizeof x;
          }));
   EXPECT(4, sizeof("abc"));
   EXPECT(7, sizeof("abc"
@@ -371,34 +378,34 @@ int main() {
 
   EXPECT(1, ({
            char x;
-           return _Alignof x;
+           _Alignof x;
          }));
   EXPECT(4, ({
            int x;
-           return _Alignof(x);
+           _Alignof(x);
          }));
   EXPECT(8, ({
            int *x;
-           return _Alignof x;
+           _Alignof x;
          }));
   EXPECT(4, ({
            int x[4];
-           return _Alignof x;
+           _Alignof x;
          }));
   EXPECT(8, ({
            int *x[4];
-           return _Alignof x;
+           _Alignof x;
          }));
 
   EXPECT(5, ({
            char x = 5;
-           return x;
+           x;
          }));
   EXPECT(42, ({
            int x = 0;
            char *p = &x;
            p[0] = 42;
-           return x;
+           x;
          }));
 
   EXPECT(0, '\0');
@@ -408,60 +415,61 @@ int main() {
   EXPECT(7, '\7');
   EXPECT(64, '\100');
 
+  EXPECT(64, "\10000"[0]);
+  EXPECT('0', "\10000"[1]);
+  EXPECT('0', "\10000"[2]);
+  EXPECT(0, "\10000"[3]);
+  // EXPECT(255, "\xffxyz"[0]);
+  // EXPECT('x', "\xffxyz"[1]);
+
   EXPECT('a', ({
            char *p = "abc";
-           return p[0];
+           p[0];
          }));
   EXPECT('b', ({
            char *p = "abc";
-           return p[1];
+           p[1];
          }));
   EXPECT('c', ({
            char *p = "abc";
-           return p[2];
+           p[2];
          }));
   EXPECT(0, ({
            char *p = "abc";
-           return p[3];
+           p[3];
          }));
 
   EXPECT(1, ({
            int x = 1;
            { int x = 2; }
-           return x;
+           x;
          }));
 
   EXPECT(0, var1);
   EXPECT(5, ({
            var1 = 5;
-           return var1;
+           var1;
          }));
   EXPECT(20, sizeof(var2));
   EXPECT(15, ({
            var2[0] = 5;
            var2[4] = 10;
-           return var2[0] + var2[4];
+           var2[0] + var2[4];
          }));
   EXPECT(5, global_arr[0]);
-
-  EXPECT(8, ({ return 3 + ({ return 5; }); }));
-  EXPECT(1, ({
-           ;
-           return 1;
-         }));
 
   EXPECT(4, ({
            struct {
              int a;
            } x;
-           return sizeof(x);
+           sizeof(x);
          }));
   EXPECT(8, ({
            struct {
              char a;
              int b;
            } x;
-           return sizeof(x);
+           sizeof(x);
          }));
   EXPECT(12, ({
            struct {
@@ -470,14 +478,14 @@ int main() {
              int c;
              char d;
            } x;
-           return sizeof(x);
+           sizeof(x);
          }));
   EXPECT(3, ({
            struct {
              int a;
            } x;
            x.a = 3;
-           return x.a;
+           x.a;
          }));
   EXPECT(8, ({
            struct {
@@ -486,7 +494,7 @@ int main() {
            } x;
            x.a = 3;
            x.b = 5;
-           return x.a + x.b;
+           x.a + x.b;
          }));
   EXPECT(8, ({
            struct {
@@ -499,7 +507,7 @@ int main() {
            } *p = &x;
            x.a = 3;
            x.b = 5;
-           return p->a + p->b;
+           p->a + p->b;
          }));
   EXPECT(8, ({
            struct tag {
@@ -509,7 +517,7 @@ int main() {
            struct tag *p = &x;
            x.a = 3;
            x.b = 5;
-           return p->a + p->b;
+           p->a + p->b;
          }));
   EXPECT(48, ({
            struct {
@@ -518,7 +526,7 @@ int main() {
                int c[5];
              } a[2];
            } x;
-           return sizeof(x);
+           sizeof(x);
          }));
 
   EXPECT(8, ({
@@ -530,91 +538,91 @@ int main() {
            } x;
            x.a[0].b = 3;
            x.a[0].c[1] = 5;
-           return x.a[0].b + x.a[0].c[1];
+           x.a[0].b + x.a[0].c[1];
          }));
 
   EXPECT(3, ({
            typedef int foo;
            foo x = 3;
-           return x;
+           x;
          }));
   EXPECT(4, ({
            myint foo = 3;
-           return sizeof(foo);
+           sizeof(foo);
          }));
 
   EXPECT(1, ({
            typedef struct foo_ foo;
-           return 1;
+           1;
          }));
 
   EXPECT(15, ({
            int i = 5;
            i *= 3;
-           return i;
+           i;
          }));
   EXPECT(1, ({
            int i = 5;
            i /= 3;
-           return i;
+           i;
          }));
   EXPECT(2, ({
            int i = 5;
            i %= 3;
-           return i;
+           i;
          }));
   EXPECT(8, ({
            int i = 5;
            i += 3;
-           return i;
+           i;
          }));
   EXPECT(2, ({
            int i = 5;
            i -= 3;
-           return i;
+           i;
          }));
   EXPECT(40, ({
            int i = 5;
            i <<= 3;
-           return i;
+           i;
          }));
   EXPECT(0, ({
            int i = 5;
            i >>= 3;
-           return i;
+           i;
          }));
   EXPECT(1, ({
            int i = 5;
            i &= 3;
-           return i;
+           i;
          }));
   EXPECT(6, ({
            int i = 5;
            i ^= 3;
-           return i;
+           i;
          }));
   EXPECT(7, ({
            int i = 5;
            i |= 3;
-           return i;
+           i;
          }));
 
   EXPECT(5, ({
            int x;
            typeof(x) y = 5;
-           return y;
+           y;
          }));
   EXPECT(1, ({
            char x;
            typeof(x) y = 257;
-           return y;
+           y;
          }));
   EXPECT(2, ({
            char x;
            typeof(x) y[2];
            y[0] = 257;
            y[1] = 1;
-           return y[0] + y[1];
+           y[0] + y[1];
          }));
 
   printf("OK\n");
