@@ -37,9 +37,11 @@ static IR *add_imm(int op, int lhs, int rhs) {
 static void kill(int r) {
   add(IR_KILL, r, -1);
 }
+
 static void label(int x) {
   add(IR_LABEL, x, -1);
 }
+
 static void jmp(int x) {
   add(IR_JMP, x, -1);
 }
@@ -88,16 +90,18 @@ static int gen_lval(Node *node) {
     return r;
   }
 
-  if (node->op == ND_LVAR) {
+  assert(node->op == ND_VAR);
+  Var *var = node->var;
+
+  if (var->is_local) {
     int r = nreg++;
-    add(IR_BPREL, r, node->offset);
+    add(IR_BPREL, r, var->offset);
     return r;
   }
 
-  assert(node->op == ND_GVAR);
   int r = nreg++;
   IR *ir = add(IR_LABEL_ADDR, r, -1);
-  ir->name = node->name;
+  ir->name = var->name;
   return r;
 }
 
@@ -214,8 +218,7 @@ static int gen_expr(Node *node) {
     label(y);
     return r1;
   }
-  case ND_GVAR:
-  case ND_LVAR:
+  case ND_VAR:
   case ND_DOT: {
     int r = gen_lval(node);
     load(node, r, r);
@@ -357,7 +360,7 @@ static void gen_stmt(Node *node) {
       return;
     int rhs = gen_expr(node->init);
     int lhs = nreg++;
-    add(IR_BPREL, lhs, node->offset);
+    add(IR_BPREL, lhs, node->var->offset);
     store(node, lhs, rhs);
     kill(lhs);
     kill(rhs);
@@ -402,7 +405,7 @@ static void gen_stmt(Node *node) {
     gen_stmt(node->body);
     if (node->inc)
       gen_stmt(node->inc);
-    add(IR_JMP, x, -1);
+    jmp(x);
     label(y);
     label(break_label);
     break_label = orig;
@@ -467,7 +470,7 @@ Vector *gen_ir(Vector *nodes) {
 
     for (int i = 0; i < node->args->len; i++) {
       Node *arg = node->args->data[i];
-      store_arg(arg, arg->offset, i);
+      store_arg(arg, arg->var->offset, i);
     }
 
     gen_stmt(node->body);

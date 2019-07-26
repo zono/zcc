@@ -73,9 +73,11 @@ static Type *new_prim_ty(int ty, int size) {
 static Type *void_ty() {
   return new_prim_ty(VOID, 0);
 }
+
 static Type *char_ty() {
   return new_prim_ty(CHAR, 1);
 }
+
 static Type *int_ty() {
   return new_prim_ty(INT, 4);
 }
@@ -238,7 +240,7 @@ static Node *primary() {
 
   if (t->ty == TK_IDENT) {
     if (!consume('(')) {
-      Node *node = new_node(ND_IDENT, t);
+      Node *node = new_node(ND_VAR, t);
       node->name = t->name;
       return node;
     }
