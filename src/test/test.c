@@ -401,6 +401,13 @@ int main() {
            return x;
          }));
 
+  EXPECT(0, '\0');
+  EXPECT(0, '\00');
+  EXPECT(0, '\000');
+  EXPECT(1, '\1');
+  EXPECT(7, '\7');
+  EXPECT(64, '\100');
+
   EXPECT('a', ({
            char *p = "abc";
            return p[0];
