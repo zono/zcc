@@ -23,6 +23,7 @@ typedef struct {
 Vector *new_vec(void);
 void vec_push(Vector *v, void *elem);
 void *vec_pop(Vector *v);
+void *vec_last(Vector *v);
 
 typedef struct {
   Vector *keys;
@@ -232,13 +233,13 @@ typedef struct Node Node;
 
 // AST node
 typedef struct Node {
-  int op;            // Node type
-  Type *ty;          // C type
-  Node *lhs;  // left-hand side
-  Node *rhs;  // right-hand side
-  int val;           // Number literal
-  Node *expr; // "return" or expresson stmt
-  Vector *stmts;     // Compound statement
+  int op;        // Node type
+  Type *ty;      // C type
+  Node *lhs;     // left-hand side
+  Node *rhs;     // right-hand side
+  int val;       // Number literal
+  Node *expr;    // "return" or expresson stmt
+  Vector *stmts; // Compound statement
 
   char *name;
 
