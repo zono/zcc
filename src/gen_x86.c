@@ -14,20 +14,21 @@ static char *argregs32[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 
 static char *backslash_escape(char *s, int len) {
   static char escaped[256] = {
-      ['\b'] = 'b', ['\f'] = 'f',  ['\n'] = 'n',  ['\r'] = 'r',
-      ['\t'] = 't', ['\\'] = '\\', ['\''] = '\'', ['"'] = '"',
+          ['\b'] = 'b', ['\f'] = 'f',  ['\n'] = 'n',  ['\r'] = 'r',
+          ['\t'] = 't', ['\\'] = '\\', ['\''] = '\'', ['"'] = '"',
   };
 
   StringBuilder *sb = new_sb();
   for (int i = 0; i < len; i++) {
-    char esc = escaped[(unsigned)s[i]];
+    uint8_t c = s[i];
+    char esc = escaped[c];
     if (esc) {
       sb_add(sb, '\\');
       sb_add(sb, esc);
-    } else if (isgraph(s[i]) || s[i] == ' ') {
-      sb_add(sb, s[i]);
+    } else if (isgraph(c) || c == ' ') {
+      sb_add(sb, c);
     } else {
-      sb_append(sb, format("\\%03o", s[i]));
+      sb_append(sb, format("\\%03o", c));
     }
   }
   return sb_get(sb);
@@ -65,9 +66,10 @@ static char *argreg(int r, int size) {
   return argregs[r];
 }
 
-void gen(Function *fn) {
+void emit_code(Function *fn) {
   char *ret = format(".Lend%d", nlabel++);
 
+  printf(".text\n");
   printf(".global %s\n", fn->name);
   printf("%s:\n", fn->name);
   emit("push rbp");
@@ -229,26 +231,29 @@ void gen(Function *fn) {
   emit("ret");
 }
 
+static void emit_data(Var *var) {
+  if (var->ty->is_extern)
+    return;
+
+  if (var->data) {
+    char *data = backslash_escape(var->data, var->ty->size);
+    printf(".data\n");
+    printf("%s:\n", var->name);
+    emit(".ascii \"%s\"", data);
+    return;
+  }
+
+  printf(".bss\n");
+  printf("%s:\n", var->name);
+  emit(".zero %d", var->ty->size);
+}
+
 void gen_x86(Program *prog) {
   printf(".intel_syntax noprefix\n");
 
-  for (int i = 0; i < prog->gvars->len; i++) {
-    Var *var = prog->gvars->data[i];
-    if (var->ty->is_extern)
-      continue;
-    if (var->data) {
-      printf(".data\n");
+  for (int i = 0; i < prog->gvars->len; i++)
+    emit_data(prog->gvars->data[i]);
 
-      printf("%s:\n", var->name);
-      emit(".ascii \"%s\"", backslash_escape(var->data, var->len));
-    } else {
-      printf(".bss\n");
-      printf("%s:\n", var->name);
-      emit(".zero %d", var->len);
-    }
-  }
-
-  printf(".text\n");
   for (int i = 0; i < prog->funcs->len; i++)
-    gen(prog->funcs->data[i]);
+    emit_code(prog->funcs->data[i]);
 }
