@@ -765,13 +765,7 @@ static Node *stmt() {
     return node;
   }
   case '{': {
-    env = new_env(env);
-    Node *node = new_node(ND_COMP_STMT, t);
-    node->stmts = new_vec();
-    while (!consume('}'))
-      vec_push(node->stmts, stmt());
-    env = env->next;
-    return node;
+    return compound_stmt();
   }
   case ';':
     return &null_stmt;
