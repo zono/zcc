@@ -1,5 +1,7 @@
 *~
 *.o
 tmp*
+temp*
 zcc
+nqueen
 .vscode
