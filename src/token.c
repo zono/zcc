@@ -4,7 +4,7 @@ typedef struct Env {
   char *path;
   char *buf;
   Vector *tokens;
-  struct Env *next;
+  struct Env *prev;
 } Env;
 
 static Env *env;
@@ -38,12 +38,12 @@ static char *read_file(FILE *fp) {
   return sb_get(sb);
 }
 
-static Env *new_env(Env *next, char *path, char *buf) {
+static Env *new_env(Env *prev, char *path, char *buf) {
   Env *env = calloc(1, sizeof(Env));
   env->path = strcmp(path, "-") ? path : "(stdin)";
   env->buf = buf;
   env->tokens = new_vec();
-  env->next = next;
+  env->prev = prev;
   return env;
 }
 
@@ -80,10 +80,11 @@ static void print_line(char *buf, char *path, char *pos) {
     int linelen = strchr(p, '\n') - start;
     fprintf(stderr, "%.*s\n", linelen, start);
 
-    // Show tags for tabs and spaces for other characters
+    // Show tabs for tabs and spaces for other characters
     // so that the column matches.
     for (int i = 0; i < col; i++)
       fprintf(stderr, (start[i] == '\t') ? "\t" : " ");
+
     fprintf(stderr, "^\n\n");
     return;
   }
@@ -120,7 +121,7 @@ static bool need_space(Token *t) {
   char *s = t->start;
   if (t->buf <= s - 1 && isspace(s[-1]))
     return true;
-  return t->buf <= s - 1 && startswith(s - 2, "*/");
+  return t->buf <= s - 2 && startswith(s - 2, "*/");
 }
 
 // For C preprocessor.
@@ -496,7 +497,7 @@ Vector *tokenize(char *path, bool add_eof) {
   if (add_eof)
     add(TK_EOF, NULL);
   Vector *v = env->tokens;
-  env = env->next;
+  env = env->prev;
 
   v = preprocess(v);
   v = strip_newline_tokens(v);
