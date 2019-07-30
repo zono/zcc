@@ -3,6 +3,6 @@ FROM ubuntu:18.04
 LABEL maintainer.0="Yusaku Maezono (@yzono)"
 
 RUN apt-get update -y \
-  && apt-get install -y gcc make git binutils libc6-dev vim clang-format
+  && apt-get install -y gcc make git binutils libc6-dev vim clang-format gdb
 
 CMD ["/bin/bash"]

@@ -10,3 +10,5 @@ services:
     tty: true
     volumes:
       - "./src:/zcc"
+    cap_add:
+      - SYS_PTRACE

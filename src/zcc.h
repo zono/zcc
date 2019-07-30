@@ -426,3 +426,8 @@ extern char *regs32[];
 extern int num_regs;
 
 void gen_x86(Program *prog);
+
+/// debug.c
+
+void debug_tokens(Vector *tokens);
+void debug_parser(Program *prog);

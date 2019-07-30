@@ -1,7 +1,7 @@
 #include "zcc.h"
 
 void usage() {
-  error("Usage: zcc [-test] [-dump-ir1] [-dump-ir2] <file>");
+  error("Usage: zcc [-test] [-debug] [-dump-ir1] [-dump-ir2] <file>");
 }
 
 int main(int argc, char **argv) {
@@ -16,12 +16,16 @@ int main(int argc, char **argv) {
   char *path;
   bool dump_ir1 = false;
   bool dump_ir2 = false;
+  bool debug = false;
 
   if (argc == 3 && !strcmp(argv[1], "-dump-ir1")) {
     dump_ir1 = true;
     path = argv[2];
   } else if (argc == 3 && !strcmp(argv[1], "-dump-ir2")) {
     dump_ir2 = true;
+    path = argv[2];
+  } else if (argc == 3 && !strcmp(argv[1], "-debug")) {
+    debug = true;
     path = argv[2];
   } else {
     if (argc != 2)
@@ -31,7 +35,13 @@ int main(int argc, char **argv) {
 
   // Tokenize and parse.
   Vector *tokens = tokenize(path, true);
+  if (debug)
+    debug_tokens(tokens);
+
   Program *prog = parse(tokens);
+  if (debug)
+    debug_parser(prog);
+
   sema(prog);
   gen_ir(prog);
 
