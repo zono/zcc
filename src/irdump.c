@@ -129,6 +129,8 @@ static void print_bb(BB *bb) {
 }
 
 void dump_ir(Vector *irv) {
+  fprintf(stderr, "---------------\nDump IR\n---------------\n");
+
   for (int i = 0; i < irv->len; i++) {
     Function *fn = irv->data[i];
     fprintf(stderr, "%s:\n", fn->name);

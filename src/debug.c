@@ -3,7 +3,7 @@
 static char indent[] = "";
 
 void debug_tokens(Vector *tokens) {
-  fprintf(stderr, "====================\nDebug Tokens\n====================\n");
+  fprintf(stderr, "---------------\nTokens\n---------------\n");
 
   for (int i = 0; i < tokens->len; i++) {
     Token *t = tokens->data[i];
@@ -291,7 +291,7 @@ void print_program(Program *prog) {
 }
 
 void debug_parser(Program *prog) {
-  fprintf(stderr, "====================\nDebug Parser\n====================\n");
+  fprintf(stderr, "---------------\nParser\n---------------\n");
+
   print_program(prog);
-  fprintf(stderr, "====================\n");
 }
